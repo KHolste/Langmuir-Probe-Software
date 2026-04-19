@@ -200,7 +200,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,
+    # Application icon — resolved relative to the project root so
+    # PyInstaller embeds it into the frozen LangmuirMeasure.exe.
+    # Missing file would break the build loudly; a fallback keeps
+    # development checkouts portable if someone removes the icon.
+    icon=('icon.ico' if os.path.isfile('icon.ico') else None),
 )
 
 coll = COLLECT(

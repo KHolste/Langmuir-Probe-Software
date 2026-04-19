@@ -52,6 +52,13 @@ SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
 ArchitecturesInstallIn64BitMode=x64compatible
+; Icon used by the installer binary itself (shown in Explorer and
+; in the setup wizard's title bar).  The same .ico file is embedded
+; into LangmuirMeasure.exe by the PyInstaller spec, so the installed
+; app, Start-menu shortcut, desktop shortcut, and Add/Remove Programs
+; entry all share one consistent visual.
+SetupIconFile=icon.ico
+UninstallDisplayIcon={app}\{#AppExeName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
