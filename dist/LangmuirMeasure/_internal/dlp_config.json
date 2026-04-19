@@ -1,0 +1,65 @@
+{
+  "v_start": -50.0,
+  "v_stop": 50.0,
+  "v_step": 0.5,
+  "settle_s": 0.02,
+  "averages": 3,
+  "compliance_mA": 10.0,
+  "bidirectional": false,
+  "simulation": true,
+  "save_folder": "C:\\Users\\Ref4EP-Applikationen\\Desktop\\pyB\u00fchler\\data\\double_langmuir",
+  "probe_parameters": {
+    "probe_id": "",
+    "geometry": "cylindrical",
+    "electrode_length_mm": 5.0,
+    "electrode_radius_mm": 0.1,
+    "electrode_area_mm2": null,
+    "electrode_spacing_mm": 3.0,
+    "material": "tungsten",
+    "notes": ""
+  },
+  "simulation_options": {
+    "noise_uA": 0.0,
+    "noise_corr": 0.0,
+    "asymmetry_pct": 0.0,
+    "offset_uA": 0.0,
+    "drift_nA_per_pt": 0.0,
+    "model": "single_probe"
+  },
+  "experiment_parameters": {
+    "gases": [
+      {
+        "gas": "Ar",
+        "flow_sccm": 0.1
+      },
+      {
+        "gas": "",
+        "flow_sccm": 0.0
+      },
+      {
+        "gas": "",
+        "flow_sccm": 0.0
+      }
+    ]
+  },
+  "fit_model": "tanh_slope",
+  "instrument_options": {
+    "speed_preset": "Fast (0.1)",
+    "output_protection": true,
+    "autorange": true,
+    "current_range_A": null,
+    "compliance_A": 0.01,
+    "custom_nplc_enabled": false,
+    "custom_nplc": 0.1,
+    "autozero": "ON",
+    "source_delay_s": 0.0,
+    "hw_avg_enabled": false,
+    "hw_avg_count": 4,
+    "hw_avg_mode": "REP",
+    "output_low": "GRO",
+    "beep": false,
+    "remote_sense": false
+  },
+  "save_csv": true,
+  "auto_analyze": false
+}
