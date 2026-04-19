@@ -29,6 +29,8 @@ operators to:
 The application runs fully offline on a laboratory PC and has no cloud
 dependencies.
 
+![Langmuir Probe Measurement teaser](docs/images/Screenshot.png)
+
 ## Measurement modes
 
 | Mode | Primary output | Typical use |
