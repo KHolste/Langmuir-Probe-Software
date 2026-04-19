@@ -1,0 +1,24 @@
+{
+  "schema": "lp-analysis-options",
+  "schema_version": 1,
+  "csv_file": "LP_2026-04-19T16-30-52_single.csv",
+  "method": "single",
+  "options": {
+    "te_window_factor": 3.0,
+    "robust_te_fit": true,
+    "compliance_mode": "exclude_clipped",
+    "hysteresis_threshold_pct": 5.0,
+    "bootstrap_enabled": false,
+    "bootstrap_n_iters": 200,
+    "v_p_method": "auto"
+  },
+  "written_at": "2026-04-19T16:30:55",
+  "analysis": {
+    "ok": true,
+    "Te_eV": 3.507131879152038,
+    "V_f_V": -14.773741811921031,
+    "V_p_V": 0.0,
+    "n_e_m3": 1.1028999900262812e+16,
+    "te_ci_eV": null
+  }
+}

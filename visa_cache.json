@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "devices": {
+    "b2901": {
+      "discovered": [
+        {
+          "resource": "ASRL4::INSTR",
+          "idn": "FUG MCP14-2000 22226-01-01"
+        },
+        {
+          "resource": "GPIB0::25::INSTR",
+          "idn": "Keysight Technologies,B2910BL,MY61390350,5.0.2029.1911"
+        },
+        {
+          "resource": "GPIB1::9::INSTR",
+          "idn": "FUG MCP14-2000 15706-01-01"
+        }
+      ],
+      "last_successful": "GPIB0::25::INSTR",
+      "scanned_at": "2026-04-17T08:12:42"
+    },
+    "k2000": {
+      "discovered": [
+        {
+          "resource": "GPIB0::9::INSTR",
+          "idn": ""
+        }
+      ],
+      "last_successful": "GPIB0::9::INSTR",
+      "scanned_at": ""
+    }
+  }
+}

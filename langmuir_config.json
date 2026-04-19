@@ -1,0 +1,30 @@
+{
+  "port": "COM10",
+  "baud": "9600",
+  "gas_mix": [
+    {
+      "species": "Argon (Ar)",
+      "sccm": "50.0"
+    },
+    {
+      "species": "\u2014 off \u2014",
+      "sccm": "0.0"
+    },
+    {
+      "species": "\u2014 off \u2014",
+      "sccm": "0.0"
+    }
+  ],
+  "probe_area_m2": "9.707500e-06",
+  "r_pin3_kohm": 1000.0,
+  "ne_scale": "Linear",
+  "stability_percent": "5.0",
+  "eq11_factor": 5.0,
+  "te_method": "eq10",
+  "vd13_mode": "direct",
+  "follow_x": true,
+  "auto_y": true,
+  "window_s": "30",
+  "save_dir": "C:\\Users\\Ref4EP-Applikationen\\Desktop\\dataBuehler",
+  "theme": "light"
+}

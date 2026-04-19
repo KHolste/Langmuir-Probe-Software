@@ -1,0 +1,16 @@
+# Buehler Double-Langmuir-Probe Export
+# Date: 2026-04-19 11:39:50
+# Instrument: 
+# VISA: GPIB0::25::INSTR
+# V_start_V: -50
+# V_stop_V: 50
+# V_step_V: 0.5
+# Settle_s: 0.02
+# Compliance_A: 0.01
+# Averages: 3
+# Bidirectional: False
+# Points: 0
+# Run_Status: completed
+# Method: double
+#
+# V_soll_V,V_ist_V,I_mean_A,I_std_A,dir,compl
