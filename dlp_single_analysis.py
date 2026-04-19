@@ -700,7 +700,8 @@ def analyze_single_iv(V, I, area_m2=None, m_i_kg=None,
                        bootstrap_enabled=False,
                        bootstrap_n_iters=200,
                        bootstrap_seed=0,
-                       v_p_method="auto") -> dict:
+                       v_p_method="auto",
+                       m_i_rel_unc=0.0) -> dict:
     """Run the full single-probe pipeline.  Returns a result dict
     with all measured quantities, validity flags, and warnings.
 
@@ -743,6 +744,16 @@ def analyze_single_iv(V, I, area_m2=None, m_i_kg=None,
         "te_eV": None, "te_err_eV": None,
         "i_ion_sat_A": None, "i_electron_sat_A": None,
         "n_e_m3": None, "n_e_basis": "bohm-from-i_ion_sat",
+        # n_e uncertainty budget — parallel taxonomy to Double's
+        # n_i_ci_note.  Populated below when both Te_err and the
+        # ingredients for a CI are available.  The scope note
+        # follows the same convention: "fit_only", "fit+mass",
+        # "fit+ion_mix", "fit+mass+ion_mix".
+        "n_e_ci95_lo_m3": None,
+        "n_e_ci95_hi_m3": None,
+        "n_e_ci_method": "unavailable",
+        "n_e_ci_note": "fit_only",
+        "n_e_ci_m_i_rel_unc": float(m_i_rel_unc or 0.0),
         "fit_R2_te": None, "fit_NRMSE_te": None,
         "fit_window_te_V": None, "fit_n_points_te": 0,
         "gas_label": gas_label, "m_i_kg": float(m_i_kg),
@@ -1065,6 +1076,47 @@ def analyze_single_iv(V, I, area_m2=None, m_i_kg=None,
         n_e = compute_n_e(i_ion, te, result["area_m2"], m_i_kg)
         if n_e is not None:
             result["n_e_m3"] = n_e
+            # ── n_e 95 % CI (parallel to Double's n_i CI) ─────────
+            # Relative variance from the ingredients we actually
+            # have: Te (covariance-based) and the ion-mass rel-unc
+            # forwarded by the orchestrator.  We deliberately
+            # treat I_ion_sat and the probe area as exact here —
+            # Single's ion-sat is a mean, not a fit (no σ_I), and
+            # probe-area uncertainty is not exposed in the Single
+            # path yet.  The scope note tells the operator what
+            # was included so nothing is implied.
+            _te_err = result.get("te_err_eV")
+            _m_rel = max(0.0, min(1.0, float(m_i_rel_unc or 0.0)))
+            _scope: list[str] = ["fit"]
+            rel_var = 0.0
+            if _te_err is not None and math.isfinite(_te_err) \
+                    and te > 0:
+                rel_var += 0.25 * (float(_te_err) / float(te)) ** 2
+            if _m_rel > 0.0:
+                rel_var += 0.25 * _m_rel ** 2
+                # If the ion-mass rel-unc came from the "mixed" /
+                # "unknown" ion-composition path, it is the
+                # ion_mix contribution; we cannot distinguish here
+                # between operator-supplied mass unc and ion-mix
+                # unc (Single has only one kwarg), so tag it the
+                # honest way — as ion_mix — since that is the
+                # only source of m_i uncertainty Single currently
+                # receives.  Operators who want to mean "gas mix
+                # mass unc" can still interpret the label.
+                _scope.append("ion_mix")
+            if rel_var > 0.0:
+                sigma_n = n_e * (rel_var ** 0.5)
+                result["n_e_ci95_lo_m3"] = float(n_e - 1.96 * sigma_n)
+                result["n_e_ci95_hi_m3"] = float(n_e + 1.96 * sigma_n)
+                result["n_e_ci_method"] = "covariance"
+                result["n_e_ci_note"] = (
+                    "fit_only" if _scope == ["fit"]
+                    else "+".join(_scope))
+            else:
+                # No ingredients → honest "unavailable" not a
+                # false-tight silence.
+                result["n_e_ci_method"] = "unavailable"
+                result["n_e_ci_note"] = "fit_only"
 
     # Sanity / quality flags.
     if i_ion is not None and i_e_sat is not None and i_ion > 0:
@@ -1170,6 +1222,23 @@ def format_single_result_html(result: dict) -> str:
     n_e_html = fmt(n_e, 'm^-3', '.3e')
     if n_e is not None:
         n_e_html += "  <span style='color:#888'>(Bohm)</span>"
+        # n_e 95 % CI — scope note labels exactly which sources
+        # contributed (parallel to Double's n_i_ci_note).
+        n_lo = result.get('n_e_ci95_lo_m3')
+        n_hi = result.get('n_e_ci95_hi_m3')
+        n_method = result.get('n_e_ci_method', 'unavailable')
+        n_note = result.get('n_e_ci_note', 'fit_only')
+        n_label = str(n_note).replace('_', '-')
+        if (n_method != 'unavailable'
+                and n_lo is not None and n_hi is not None):
+            n_e_html += (
+                f"<br/><span style='color:#889;font-size:10px;'>"
+                f"95% CI ({n_label}): "
+                f"[{n_lo:.3e}, {n_hi:.3e}] m^-3</span>")
+        elif n_method == 'unavailable':
+            n_e_html += ("<br/><span style='color:#988;"
+                         "font-size:10px;'>n_e 95% CI: unavailable"
+                         "</span>")
     rows.append(f"<tr><td><b>n_e</b></td><td>{n_e_html}</td></tr>")
     if result['fit_R2_te'] is not None:
         q = (f"R^2={result['fit_R2_te']:.3f}, "

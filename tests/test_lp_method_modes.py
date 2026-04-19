@@ -511,9 +511,12 @@ class TestSingleAnalysisGasAndAreaPropagation:
             win._dataset_method = "single"
             monkeypatch.setattr(
                 win, "_build_lp_probe_area_m2", lambda: 2.5e-6)
+            # 3-tuple contract after the mixed-ion-composition
+            # pass: (gas_label, m_i_kg, m_i_rel_unc).  Monatomic
+            # gases have no ion-composition ambiguity → rel_unc=0.
             monkeypatch.setattr(
                 win, "_build_lp_gas_context",
-                lambda: ("Krypton (Kr)", 1.39e-25))
+                lambda: ("Krypton (Kr)", 1.39e-25, 0.0))
             f = FakeB2901v2(model="single_probe", te_eV=4.0,
                             i_ion_sat=5e-6, i_electron_sat=1.0e-3,
                             v_plasma_V=0.0, sheath_conductance=0.0,
@@ -544,7 +547,7 @@ class TestSingleAnalysisGasAndAreaPropagation:
                 win, "_build_lp_probe_area_m2", lambda: 1.0e-5)
             monkeypatch.setattr(
                 win, "_build_lp_gas_context",
-                lambda: ("Argon (Ar)", None))
+                lambda: ("Argon (Ar)", None, 0.0))
             f = FakeB2901v2(model="single_probe", te_eV=4.0,
                             sheath_conductance=0.0,
                             electron_sat_slope=0.0,

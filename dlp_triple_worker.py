@@ -66,6 +66,7 @@ class TripleProbeWorker(QObject):
         area_m2: float = DEFAULT_AREA_M2,
         mi_kg: Optional[float] = None,
         species_name: str = DEFAULT_SPECIES,
+        mi_rel_unc: float = 0.0,
         v_d13_sign: int = +1,
         prefer_eq10: bool = True,
         tick_ms: int = DEFAULT_TICK_MS,
@@ -97,6 +98,14 @@ class TripleProbeWorker(QObject):
         self._mi = float(mi_kg) if mi_kg is not None else mi_from_species(
             species_name)
         self._species = species_name
+        # Ion-mass relative uncertainty (from the shared ion-composition
+        # context): feeds the mass-only n_e CI emitted per tick.  Zero
+        # means "no uncertainty propagated" — the sample payload will
+        # still carry CI fields, but method="unavailable".
+        try:
+            self._mi_rel_unc = max(0.0, float(mi_rel_unc or 0.0))
+        except (TypeError, ValueError):
+            self._mi_rel_unc = 0.0
         self._sign = int(v_d13_sign)
         # Optional Triple-Probe-current override for the simulation
         # path: when set, the SMU current readback is bypassed and
@@ -188,6 +197,7 @@ class TripleProbeWorker(QObject):
             area_m2=self._area,
             mi_kg=self._mi,
             prefer_eq10=self._prefer_eq10,
+            mi_rel_unc=self._mi_rel_unc,
         )
         sample = {
             "t_rel_s": time.perf_counter() - self._t0,
@@ -201,6 +211,11 @@ class TripleProbeWorker(QObject):
             "species": self._species,
             "area_m2": self._area,
             "mi_kg": self._mi,
+            "mi_rel_unc": self._mi_rel_unc,
+            "ne_ci95_lo_m3": analysis.get("ne_ci95_lo_m3"),
+            "ne_ci95_hi_m3": analysis.get("ne_ci95_hi_m3"),
+            "ne_ci_method": analysis.get("ne_ci_method", "unavailable"),
+            "ne_ci_note": analysis.get("ne_ci_note", "fit_only"),
         }
         self.sample.emit(sample)
 

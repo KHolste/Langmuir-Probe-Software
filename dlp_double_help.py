@@ -270,6 +270,102 @@ HELP_BODY = """
   </tr>
 </table>
 
+<h2>Ion composition and n<sub>i</sub> bias (O<sub>2</sub>,
+  N<sub>2</sub>, H<sub>2</sub> plasmas)</h2>
+<p>
+  The Bohm density formula needs the <em>positive-ion</em> mass,
+  not the neutral-gas mass.  For monatomic feed gases (Ar, He,
+  Ne, Xe, Kr) these are the same thing and nothing changes.
+  Molecular feed gases (O<sub>2</sub>, N<sub>2</sub>, H<sub>2</sub>)
+  dissociate in the discharge, and the dominant positive ion can
+  be the <span class="term">molecule</span> (e.g.
+  O<sub>2</sub><sup>+</sup>) or the <span class="term">atom</span>
+  (e.g. O<sup>+</sup>) depending on power, pressure and
+  geometry.  Because
+  <span class="term">n<sub>i</sub> &prop; 1 / &radic;m<sub>i</sub></span>,
+  assuming the wrong one biases the inferred density by up to
+  ~40&thinsp;% for O<sub>2</sub> (mass ratio 32:16 &rarr; density
+  ratio &radic;2).
+</p>
+<p>
+  The <em>Experiment&hellip;</em> dialog exposes this as an
+  <em>Ion composition</em> combo with three operator-facing modes:
+</p>
+<table class="opts">
+  <tr>
+    <td class="k">Molecular ion</td>
+    <td>The dominant positive ion is the molecule (default; typical
+        for low-to-moderate power magnetron discharges in
+        O<sub>2</sub>).</td>
+  </tr>
+  <tr>
+    <td class="k">Atomic ion</td>
+    <td>The dominant positive ion is the dissociated atom (typical
+        for high-density / low-pressure ICP or ECR sources where
+        the O<sub>2</sub> is mostly dissociated).</td>
+  </tr>
+  <tr>
+    <td class="k">Mixed</td>
+    <td>You have a best estimate for the atomic-ion fraction
+        <span class="term">x</span> and its half-width
+        uncertainty <span class="term">&Delta;x</span>.  The
+        effective ion mass is a linear interpolation
+        <span class="term">m = (1&minus;x)&middot;m<sub>mol</sub>
+        + x&middot;m<sub>atomic</sub></span>, and the
+        n<sub>i</sub> CI is widened via
+        <span class="term">&sigma;<sub>m</sub>/m =
+        |m<sub>mol</sub>&minus;m<sub>atomic</sub>|&middot;
+        &Delta;x / m</span>.  Choose this when you do know
+        roughly what fraction of the positive ions is atomic
+        (e.g. "about 30 %, ±10 %").</td>
+  </tr>
+  <tr>
+    <td class="k">Unknown</td>
+    <td>You do not know the composition.  The software uses the
+        mid-point mass AND widens the n<sub>i</sub> CI to span
+        the full molecular&harr;atomic bracket.  The
+        <em>n<sub>i</sub> CI scope label</em> in the result block
+        then includes <code>ion_mix</code> so nobody reads the
+        reported width as if the composition were known.  Prefer
+        Unknown to Mixed when you would otherwise have to guess
+        <span class="term">x</span>; Unknown is the safer default
+        in that case.</td>
+  </tr>
+</table>
+<p class="note">
+  This is a pragmatic first correction &mdash; the software does
+  <em>not</em> run a plasma-chemistry model and does not solve for
+  the actual dissociation fraction.  When <em>Unknown</em> is
+  selected the CI becomes deliberately wide; that is the honest
+  answer if you do not know the dominant positive ion.
+</p>
+
+<h3>Presets</h3>
+<p>
+  The <em>Experiment&hellip;</em> dialog offers a preset combo at
+  the top of the Ion-composition group for common plasma regimes
+  (inert monatomic, O<sub>2</sub> magnetron molecular-ion-dominant,
+  O<sub>2</sub> high-power atomic-ion-rich, N<sub>2</sub> molecular,
+  H<sub>2</sub> mixed, unknown).  Picking a preset fills the
+  Mode / <span class="term">x</span> / <span class="term">&Delta;x</span>
+  fields from a curated lookup; editing any of them manually after
+  that reverts the preset combo to <em>Custom</em> so the UI state
+  never lies about which preset is in effect.  The chosen preset
+  is persisted in the analysis sidecar.
+</p>
+<p>
+  Presets are a convenience, <span class="warn">not</span> a
+  plasma-chemistry solver.  They are conservative where the regime
+  is genuinely uncertain (e.g. <em>O<sub>2</sub> high-power</em>
+  uses <span class="term">x = 70&thinsp;%, &Delta;x = 20&thinsp;%</span>).
+  If you do not know the regime at all, choose
+  <em>Unknown &mdash; widen CI</em>.  All three probe methods
+  (Single, Double, Triple) consume the same preset / composition
+  settings: the values you pick in Experiment&hellip; apply across
+  the whole application, not just the method whose options dialog
+  is open.
+</p>
+
 <h2>When to distrust the numbers</h2>
 <ul>
   <li><span class="warn">Fit warning</span> banner with a clipping

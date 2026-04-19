@@ -46,6 +46,10 @@ def compute_double_analysis(V, I, *,
                               bootstrap_seed: int = 0,
                               probe_area_rel_unc: float = 0.0,
                               ion_mass_rel_unc: float = 0.0,
+                              ion_mix_rel_unc: float = 0.0,
+                              ion_composition_mode: str = "molecular",
+                              ion_x_atomic: float = 0.0,
+                              ion_x_atomic_unc: float = 0.0,
                               ) -> dict:
     """Run V2's saturation-branch + model + comparison pipeline on
     explicit ``V`` / ``I`` arrays and return a result dict.
@@ -211,7 +215,22 @@ def compute_double_analysis(V, I, *,
 
     # Density (Bohm) — same constants V2 uses.
     area_m2 = _resolve_area_m2(probe_params)
-    mi = _resolve_mi_kg(gases)
+    # Resolve the effective ion mass under the operator-selected
+    # composition mode ("molecular" / "atomic" / "unknown").  When
+    # the caller leaves ion_mix_rel_unc at 0 AND supplies no gases,
+    # falls back to the legacy helper so existing Ar-only tests
+    # keep producing byte-identical numbers.
+    mi, _mi_mix_rel = _resolve_mi_kg_with_unc(
+        gases, ion_composition_mode,
+        x_atomic=ion_x_atomic,
+        x_atomic_unc=ion_x_atomic_unc)
+    # If the caller has not explicitly provided ion_mix_rel_unc
+    # (default 0) but the mass resolver returned one from
+    # ``unknown`` mode, use that value.  An explicit non-zero
+    # caller-supplied value wins — this lets callers such as tests
+    # inject a custom rel-unc without going through the gas table.
+    if ion_mix_rel_unc == 0.0 and _mi_mix_rel > 0.0:
+        ion_mix_rel_unc = _mi_mix_rel
     pp = dict(mfit)
     if (mi and mi > 0 and area_m2 > 0
             and not np.isnan(mfit.get("Te_eV", float("nan")))):
@@ -254,6 +273,15 @@ def compute_double_analysis(V, I, *,
         # in the scope note so the label stays honest.
         _area_rel = max(0.0, min(1.0, float(probe_area_rel_unc)))
         _mass_rel = max(0.0, min(1.0, float(ion_mass_rel_unc)))
+        # Ion-composition ambiguity is a separate, physically
+        # independent uncertainty source (molecular vs atomic
+        # positive ion in dissociating gases like O₂).  It feeds
+        # the SAME mass-term structure as the user-supplied σ_m
+        # (both enter as ¼·(σ/m)² via v_Bohm ∝ √(T_e/m_i)) but we
+        # track it under its own "ion_mix" scope tag so the
+        # operator can tell the two sources apart in the n_i_ci_note
+        # label and in the sidecar.
+        _mix_rel = max(0.0, min(1.0, float(ion_mix_rel_unc)))
         _scope = ["fit"]
         if _rel_var is not None:
             if _area_rel > 0.0:
@@ -262,12 +290,16 @@ def compute_double_analysis(V, I, *,
             if _mass_rel > 0.0:
                 _rel_var = _rel_var + 0.25 * _mass_rel ** 2
                 _scope.append("mass")
+            if _mix_rel > 0.0:
+                _rel_var = _rel_var + 0.25 * _mix_rel ** 2
+                _scope.append("ion_mix")
         # Publish the final note even when the CI itself degrades
         # so sidecar / history reflect the operator's inputs.
         pp["n_i_ci_note"] = (
             "fit_only" if _scope == ["fit"] else "+".join(_scope))
         pp["n_i_ci_area_rel_unc"] = float(_area_rel)
         pp["n_i_ci_mass_rel_unc"] = float(_mass_rel)
+        pp["n_i_ci_ion_mix_rel_unc"] = float(_mix_rel)
         if _rel_var is not None and _rel_var >= 0.0:
             sigma_n = n_i * (float(_rel_var) ** 0.5)
             pp["n_i_ci95_lo_m3"] = float(n_i - 1.96 * sigma_n)
@@ -288,6 +320,8 @@ def compute_double_analysis(V, I, *,
             0.0, min(1.0, float(probe_area_rel_unc))))
         pp["n_i_ci_mass_rel_unc"] = float(max(
             0.0, min(1.0, float(ion_mass_rel_unc))))
+        pp["n_i_ci_ion_mix_rel_unc"] = float(max(
+            0.0, min(1.0, float(ion_mix_rel_unc))))
     # Carry the compliance summary into the plasma dict so the V2
     # HTML renderer — which already takes pp as its only data source
     # — can render the Compliance row without a back-channel.
@@ -340,6 +374,10 @@ def _resolve_area_m2(probe_params: Optional[dict]) -> float:
 
 
 def _resolve_mi_kg(gases: Optional[list]) -> Optional[float]:
+    """Legacy single-return resolver — used only by callers that do
+    not care about ion-composition uncertainty (e.g. older tests).
+    New code should prefer :func:`_resolve_mi_kg_with_unc`.
+    """
     if not gases:
         return None
     try:
@@ -347,6 +385,36 @@ def _resolve_mi_kg(gases: Optional[list]) -> Optional[float]:
         return effective_ion_mass_kg(gases)
     except Exception:
         return None
+
+
+def _resolve_mi_kg_with_unc(
+    gases: Optional[list], mode: str,
+    *,
+    x_atomic: float = 0.0,
+    x_atomic_unc: float = 0.0,
+) -> tuple[Optional[float], float]:
+    """Resolve ``(m_i_kg, ion_mix_rel_unc)`` under ``mode``.
+
+    Wraps :func:`dlp_experiment_dialog.effective_ion_mass_kg_with_unc`
+    so the analysis layer never imports Qt symbols — the helper
+    module is Qt-free.  Returns ``(None, 0.0)`` when no gases are
+    available or the helper fails (matches the legacy resolver's
+    "quietly unavailable" contract).
+
+    The ``x_atomic`` / ``x_atomic_unc`` kwargs are forwarded
+    verbatim; they only have an effect when ``mode == "mixed"``.
+    """
+    if not gases:
+        return None, 0.0
+    try:
+        from dlp_experiment_dialog import (
+            effective_ion_mass_kg_with_unc,
+        )
+        return effective_ion_mass_kg_with_unc(
+            gases, mode=mode,
+            x_atomic=x_atomic, x_atomic_unc=x_atomic_unc)
+    except Exception:
+        return None, 0.0
 
 
 def _apply_clipping_guard(mfit: dict, comp_info: dict,

@@ -47,7 +47,8 @@ class LPMeasurementWindow(QWidget):
                  sim_current_a: Optional[float] = None,
                  gas_mix_label: Optional[str] = None,
                  mi_kg: Optional[float] = None,
-                 area_m2: Optional[float] = None):
+                 area_m2: Optional[float] = None,
+                 ion_composition_context: Optional[dict] = None):
         super().__init__(parent)
         self.setWindowTitle("Langmuir Probe Measurement")
         self.setWindowFlag(Qt.WindowType.Window, True)
@@ -71,6 +72,15 @@ class LPMeasurementWindow(QWidget):
         # optional — Argon is the safe default.
         self._gas_mix_label = gas_mix_label
         self._mi_kg_override = mi_kg
+        # Shared ion-composition context (mode, x_atomic, x_atomic_unc,
+        # preset key, mi_rel_unc).  Pulled from the LP main window's
+        # Experiment params so Triple sees the SAME assumption as
+        # Single and Double.  Triple's per-tick n_e uses mi_kg
+        # directly (already set above) so the preset's numerical
+        # effect is carried by that field; this dict is the audit
+        # trail persisted in the CSV header.
+        self._ion_composition_context = dict(
+            ion_composition_context or {})
         # Probe area is owned by the main window's Probe Params…
         # dialog; the LP window only displays it.  Falls back to
         # the documented default until the main window injects the
@@ -438,6 +448,15 @@ class LPMeasurementWindow(QWidget):
         species = self._gas_mix_label or "Argon (Ar)"
         area_m2 = float(self._area_m2)
         try:
+            # The ion-composition mi_rel_unc feeds the Triple mass-only
+            # n_e CI.  Pulled from the shared context so Single /
+            # Double / Triple all quote the same uncertainty model.
+            try:
+                mi_rel_unc = float(
+                    (self._ion_composition_context or {}).get(
+                        "mi_rel_unc", 0.0) or 0.0)
+            except (TypeError, ValueError):
+                mi_rel_unc = 0.0
             self._worker = TripleProbeWorker(
                 self._smu, self._k2000,
                 v_d12_setpoint=float(self.spnVd12.value()),
@@ -445,6 +464,7 @@ class LPMeasurementWindow(QWidget):
                 area_m2=area_m2,
                 species_name=species,
                 mi_kg=self._mi_kg_override,
+                mi_rel_unc=mi_rel_unc,
                 v_d13_sign=int(self.cmbSign.currentData()),
                 prefer_eq10=bool(self.cmbEqMode.currentData()),
                 tick_ms=int(self.spnTick.value()),
@@ -486,7 +506,21 @@ class LPMeasurementWindow(QWidget):
         self.lblImeas.setText(f"{sample.i_measure_A:+.4e} A")
         self.lblTe.setText(f"{sample.te_eV:.3f} eV"
                             if sample.te_eV == sample.te_eV else "NaN")
-        self.lblNe.setText(f"{sample.ne_m3:.3e} m\u207B\u00B3")
+        ne_txt = f"{sample.ne_m3:.3e} m\u207B\u00B3"
+        lo, hi = sample.ne_ci95_lo_m3, sample.ne_ci95_hi_m3
+        if (lo is not None and hi is not None
+                and sample.ne_m3 == sample.ne_m3
+                and sample.ne_m3 > 0.0):
+            # Symmetric mass-only CI: show a single ±half-width so the
+            # operator reads the uncertainty at a glance.  Falls back
+            # to the bare n_e when CI was not propagated (fit_only).
+            try:
+                half = 0.5 * (float(hi) - float(lo))
+                if half > 0.0:
+                    ne_txt += f"  \u00B1 {half:.2e}"
+            except (TypeError, ValueError):
+                pass
+        self.lblNe.setText(ne_txt)
         self.lblSamples.setText(str(len(self._dataset)))
         redraw = False
         if sample.te_eV == sample.te_eV:
@@ -583,7 +617,7 @@ class LPMeasurementWindow(QWidget):
     # Save / autosave / clear
     # ------------------------------------------------------------------
     def _build_meta(self) -> dict:
-        return {
+        meta: dict[str, str] = {
             "V_d12_setpoint_V": f"{self.spnVd12.value():.4g}",
             "Compliance_A": f"{self.spnCompliance.value():.4g}",
             "Probe_Area_m2": f"{float(self._area_m2):.4g}",
@@ -591,6 +625,59 @@ class LPMeasurementWindow(QWidget):
             "V_d13_sign": str(self.cmbSign.currentData()),
             "Tick_ms": str(self.spnTick.value()),
         }
+        # Ion-composition audit trail — added whenever a context
+        # dict was handed down from the LP main window.  The values
+        # are shared across Single / Double / Triple: the same
+        # experiment settings produced the same numbers everywhere.
+        # A single ``Ion_Note`` entry spells out what the Ion_*
+        # keys mean physically, so a later reader (or another
+        # engineer) cannot misread ``Ion_Composition_Mode=atomic``
+        # as "atomic feed gas" — it is a plasma-phase assumption.
+        ctx = getattr(self, "_ion_composition_context", None) or {}
+        if ctx:
+            meta["Ion_Note"] = (
+                "plasma-phase positive-ion assumption for the "
+                "Bohm density formula; feed flows above remain "
+                "molecular inlet flows")
+            if "ion_composition_preset" in ctx:
+                meta["Ion_Composition_Preset"] = str(
+                    ctx.get("ion_composition_preset") or "custom")
+            if "ion_composition_mode" in ctx:
+                meta["Ion_Composition_Mode"] = str(
+                    ctx.get("ion_composition_mode") or "molecular")
+            if "x_atomic" in ctx:
+                meta["Ion_x_atomic"] = \
+                    f"{float(ctx.get('x_atomic', 0.0)):.3f}"
+            if "x_atomic_unc" in ctx:
+                meta["Ion_x_atomic_unc"] = \
+                    f"{float(ctx.get('x_atomic_unc', 0.0)):.3f}"
+            if "mi_rel_unc" in ctx:
+                mi_rel = float(ctx.get("mi_rel_unc", 0.0) or 0.0)
+                meta["Ion_mi_rel_unc"] = f"{mi_rel:.4f}"
+                # Derived n_e relative uncertainty under the Triple
+                # Bohm scaling: n_e ∝ 1/√m_i ⇒ σ_n/n = ½·σ_m/m.
+                # Recording the derived number too keeps the CSV
+                # self-describing even when a reader doesn't know
+                # the physics.
+                if mi_rel > 0.0:
+                    meta["Ion_ne_rel_unc"] = f"{0.5 * mi_rel:.4f}"
+            # Per-gas composition overrides (may be empty).  One
+            # meta line per molecular gas with a non-default entry,
+            # so a later reader sees exactly which gases carried
+            # which regime.
+            pg = ctx.get("per_gas_composition")
+            if isinstance(pg, dict):
+                for _g, _entry in pg.items():
+                    if not isinstance(_entry, dict):
+                        continue
+                    _m = str(_entry.get("mode", "molecular"))
+                    _x = float(_entry.get("x_atomic", 0.0))
+                    _dx = float(_entry.get("x_atomic_unc", 0.0))
+                    _p = str(_entry.get("preset", "custom"))
+                    meta[f"Ion_{_g}"] = (
+                        f"mode={_m}, x={_x:.3f}, "
+                        f"\u0394x={_dx:.3f}, preset={_p}")
+        return meta
 
     def _maybe_autosave(self) -> None:
         if not self.chkAutoSave.isChecked():
@@ -664,6 +751,7 @@ def show_or_raise(parent, smu, k2000, *,
                   gas_mix_label: Optional[str] = None,
                   mi_kg: Optional[float] = None,
                   area_m2: Optional[float] = None,
+                  ion_composition_context: Optional[dict] = None,
                   ) -> LPMeasurementWindow:
     """Singleton accessor on the parent window.
 
@@ -679,7 +767,8 @@ def show_or_raise(parent, smu, k2000, *,
             smu, k2000, parent=parent,
             sim_current_a=sim_current_a,
             gas_mix_label=gas_mix_label, mi_kg=mi_kg,
-            area_m2=area_m2)
+            area_m2=area_m2,
+            ion_composition_context=ion_composition_context)
         parent._lp_window = win
         parent._triple_window = win
     else:
@@ -700,6 +789,12 @@ def show_or_raise(parent, smu, k2000, *,
                 win.lblArea.setText(win._format_area_label(area_m2))
             except Exception:
                 pass
+        if ion_composition_context is not None:
+            # Always replace wholesale — the context is a small
+            # snapshot, not a partial patch, and we want Triple's
+            # CSV header to reflect the *current* experiment state.
+            win._ion_composition_context = dict(
+                ion_composition_context)
     win.show()
     win.raise_()
     win.activateWindow()

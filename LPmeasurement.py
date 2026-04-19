@@ -1019,17 +1019,42 @@ class LPMainWindow(DLPMainWindowV2):
 
         # Pull gas mix from the central Experiment dialog so the
         # Triple analysis honours mixtures, not just one species.
-        gas_label, mi_kg = self._build_lp_gas_context()
+        gas_label, mi_kg, mi_rel_unc = self._build_lp_gas_context()
         # Probe area is owned by Probe Params… — the LP window only
         # displays it (no second editable area down there).
         area_m2 = self._build_lp_probe_area_m2()
+        # Build the shared ion-composition context.  This is what
+        # makes Triple consume the *same* Experiment-dialog
+        # settings that Single and Double already use.  The Triple
+        # window writes it into its CSV header (audit trail); the
+        # numerical effect on the per-tick n_e is already carried
+        # by the mi_kg value above.
+        exp_params = getattr(
+            self, "_experiment_params", {}) or {}
+        ion_ctx = {
+            "ion_composition_preset": str(
+                exp_params.get("ion_composition_preset", "custom")),
+            "ion_composition_mode": str(
+                exp_params.get("ion_composition_mode", "molecular")),
+            "x_atomic": float(exp_params.get("x_atomic", 0.0)),
+            "x_atomic_unc": float(
+                exp_params.get("x_atomic_unc", 0.0)),
+            "mi_rel_unc": float(mi_rel_unc or 0.0),
+        }
+        # Per-gas overrides (may be empty) — carried through so the
+        # Triple CSV header's audit trail records the exact
+        # per-molecular-gas assumption, not just the global fallback.
+        _pg = exp_params.get("per_gas_composition") or {}
+        if isinstance(_pg, dict) and _pg:
+            ion_ctx["per_gas_composition"] = dict(_pg)
 
         from dlp_lp_window import show_or_raise as _open_lp
         win = _open_lp(self, self.smu, self.k2000,
                         sim_current_a=self._lp_sim_current_a,
                         gas_mix_label=gas_label,
                         mi_kg=mi_kg,
-                        area_m2=area_m2)
+                        area_m2=area_m2,
+                        ion_composition_context=ion_ctx)
         # Re-connect the running_changed signal (safe to disconnect first
         # in case the singleton was raised, not freshly created).
         try:
@@ -1217,7 +1242,9 @@ class LPMainWindow(DLPMainWindowV2):
           Argon fallback (worker resolves ``Argon (Ar)`` then).
         """
         try:
-            from dlp_experiment_dialog import effective_ion_mass_kg
+            from dlp_experiment_dialog import (
+                effective_ion_mass_kg_with_unc,
+            )
             params = getattr(self, "_experiment_params", None) or {}
             gases = params.get("gases", []) or []
             entries = [(g.get("gas", ""), float(g.get("flow_sccm", 0)))
@@ -1226,15 +1253,29 @@ class LPMainWindow(DLPMainWindowV2):
         except Exception:
             entries = []
         if not entries:
-            return "Argon (Ar)", None
+            return "Argon (Ar)", None, 0.0
         label = " + ".join(f"{name} {flow:g}" for name, flow in entries)
         label += " sccm"
+        # Forward the operator's ion-composition choice so Single
+        # honours the exact same assumption as Double — previously
+        # Single silently used the neutral (molecular) mass.  The
+        # per-gas dict (when present) lets each molecular gas carry
+        # its own regime; any gas without an entry falls back to the
+        # legacy global triple.
+        mode = str(params.get("ion_composition_mode", "molecular"))
+        x_at = float(params.get("x_atomic", 0.0))
+        x_at_unc = float(params.get("x_atomic_unc", 0.0))
+        per_gas = params.get("per_gas_composition", {}) or {}
+        if not isinstance(per_gas, dict):
+            per_gas = {}
         try:
-            mi_kg = effective_ion_mass_kg(
-                [{"gas": n, "flow_sccm": f} for n, f in entries])
+            mi_kg, mi_rel_unc = effective_ion_mass_kg_with_unc(
+                [{"gas": n, "flow_sccm": f} for n, f in entries],
+                mode=mode, x_atomic=x_at, x_atomic_unc=x_at_unc,
+                per_gas_composition=per_gas)
         except Exception:
-            mi_kg = None
-        return label, mi_kg
+            mi_kg, mi_rel_unc = None, 0.0
+        return label, mi_kg, float(mi_rel_unc)
 
     @Slot(bool)
     def _on_triple_running_changed(self, running: bool) -> None:
@@ -1406,7 +1447,7 @@ class LPMainWindow(DLPMainWindowV2):
         compliance = list(self._compliance) if self._compliance else None
         directions = list(self._directions) if self._directions else None
         area_m2 = self._build_lp_probe_area_m2()
-        gas_label, m_i_kg = self._build_lp_gas_context()
+        gas_label, m_i_kg, m_i_rel_unc = self._build_lp_gas_context()
         from dlp_single_analysis import (analyze_single_iv,
                                           format_single_result_html)
         from DoubleLangmuir_measure_v2 import _append_html_block
@@ -1425,7 +1466,13 @@ class LPMainWindow(DLPMainWindowV2):
             hysteresis_threshold_pct=opts.hysteresis_threshold_pct,
             bootstrap_enabled=opts.bootstrap_enabled,
             bootstrap_n_iters=opts.bootstrap_n_iters,
-            v_p_method=getattr(opts, "v_p_method", "auto"))
+            v_p_method=getattr(opts, "v_p_method", "auto"),
+            # Forward the ion-mass relative uncertainty coming from
+            # the Experiment-dialog ion-composition mode (0.0 for
+            # molecular / atomic, >0 for mixed / unknown on a gas
+            # with an atomic-ion entry).  Single now carries the
+            # same n_e CI scope-tag taxonomy as Double.
+            m_i_rel_unc=float(m_i_rel_unc))
         self._last_single_analysis = result
         if result["ok"]:
             te = result["te_eV"]; vf = result["v_float_V"]
@@ -1520,10 +1567,47 @@ class LPMainWindow(DLPMainWindowV2):
                     # reader always knows it is fit-only.
                     summary["n_i_ci_note"] = plasma_dict.get(
                         "n_i_ci_note", "fit_only")
+                    # Record the ion-composition mode and the
+                    # derived ion-mix rel-unc so a later re-analysis
+                    # can tell whether the width reflects a known
+                    # molecular ion, a known atomic ion, or the
+                    # operator-declared "unknown" widening.
+                    exp_params = getattr(
+                        self, "_experiment_params", {}) or {}
+                    summary["ion_composition_mode"] = \
+                        exp_params.get(
+                            "ion_composition_mode", "molecular")
+                    summary["n_i_ci_ion_mix_rel_unc"] = \
+                        plasma_dict.get(
+                            "n_i_ci_ion_mix_rel_unc", 0.0)
+                    # Mixed-mode inputs are persisted regardless of
+                    # mode so a later re-analysis of the CSV has the
+                    # operator's belief written down explicitly.
+                    summary["x_atomic"] = float(
+                        exp_params.get("x_atomic", 0.0))
+                    summary["x_atomic_unc"] = float(
+                        exp_params.get("x_atomic_unc", 0.0))
+                    # Preset key — persisted so a later reader can
+                    # cite the regime by stable name rather than
+                    # reconstructing it from the (mode, x, Δx)
+                    # triple.  "custom" means "the operator set
+                    # the fields manually".
+                    summary["ion_composition_preset"] = str(
+                        exp_params.get(
+                            "ion_composition_preset", "custom"))
+                    # Per-gas composition overrides (may be empty).
+                    # Persisted verbatim so a later reader sees the
+                    # exact per-molecular-gas assumption in force at
+                    # the time of the run.
+                    _pg = exp_params.get("per_gas_composition") or {}
+                    if isinstance(_pg, dict) and _pg:
+                        summary["per_gas_composition"] = dict(_pg)
                 comp_info = getattr(self, "_last_compliance_info", None)
                 if comp_info:
                     summary["compliance_info"] = comp_info
             elif method == "single" and single_result:
+                exp_params = getattr(
+                    self, "_experiment_params", {}) or {}
                 summary = {
                     "ok":       bool(single_result.get("ok")),
                     "Te_eV":    single_result.get("te_eV"),
@@ -1531,6 +1615,42 @@ class LPMainWindow(DLPMainWindowV2):
                     "V_p_V":    single_result.get("v_plasma_V"),
                     "n_e_m3":   single_result.get("n_e_m3"),
                     "te_ci_eV": single_result.get("te_ci_eV"),
+                    # n_e CI + scope — Single now carries the same
+                    # scope-tag taxonomy as Double's n_i_ci_note.
+                    "n_e_ci95_lo_m3":
+                        single_result.get("n_e_ci95_lo_m3"),
+                    "n_e_ci95_hi_m3":
+                        single_result.get("n_e_ci95_hi_m3"),
+                    "n_e_ci_method":
+                        single_result.get("n_e_ci_method"),
+                    "n_e_ci_note":
+                        single_result.get("n_e_ci_note"),
+                    # Ion-composition inputs the operator selected,
+                    # persisted verbatim so a later re-analysis of
+                    # the CSV knows the assumption in effect.
+                    "ion_composition_mode":
+                        exp_params.get(
+                            "ion_composition_mode", "molecular"),
+                    "x_atomic":
+                        float(exp_params.get("x_atomic", 0.0)),
+                    "x_atomic_unc":
+                        float(exp_params.get("x_atomic_unc", 0.0)),
+                    "ion_composition_preset":
+                        str(exp_params.get(
+                            "ion_composition_preset", "custom")),
+                    # Per-gas composition overrides persisted for
+                    # Single too — same reader-facing shape as the
+                    # Double / Triple sidecars.  Omitted when empty.
+                    **({
+                        "per_gas_composition": dict(
+                            exp_params.get("per_gas_composition") or {})
+                    } if (exp_params.get("per_gas_composition")
+                           and isinstance(
+                               exp_params.get("per_gas_composition"),
+                               dict)) else {}),
+                    "n_e_ci_m_i_rel_unc":
+                        single_result.get(
+                            "n_e_ci_m_i_rel_unc", 0.0),
                     # Bidirectional diagnostic — persisted so a
                     # future re-analysis has the fwd/rev drift
                     # picture too.  Absent / None on monodirectional

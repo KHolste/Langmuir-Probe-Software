@@ -67,6 +67,15 @@ class TripleSample:
     species: Optional[str] = None
     area_m2: Optional[float] = None
     mi_kg: Optional[float] = None
+    # Mass-only n_e CI (from ion-composition mi_rel_unc) — homogeneous
+    # per run, so surfaced in the CSV header rather than per-row.
+    # Kept as optional fields on the sample so the worker can attach
+    # them per tick and the UI can show ±CI without a second lookup.
+    mi_rel_unc: Optional[float] = None
+    ne_ci95_lo_m3: Optional[float] = None
+    ne_ci95_hi_m3: Optional[float] = None
+    ne_ci_method: Optional[str] = None
+    ne_ci_note: Optional[str] = None
 
     @classmethod
     def from_worker_dict(cls, d: dict) -> "TripleSample":
@@ -86,6 +95,19 @@ class TripleSample:
             except (TypeError, ValueError):
                 return float("nan")
 
+        def opt_f(key: str) -> Optional[float]:
+            v = d.get(key)
+            if v is None:
+                return None
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return None
+
+        def opt_s(key: str) -> Optional[str]:
+            v = d.get(key)
+            return str(v) if v is not None else None
+
         return cls(
             t_s=f("t_rel_s"),
             u_supply_V=f("v_d12_setpoint"),
@@ -100,6 +122,11 @@ class TripleSample:
                      else None),
             mi_kg=(float(d["mi_kg"]) if d.get("mi_kg") is not None
                    else None),
+            mi_rel_unc=opt_f("mi_rel_unc"),
+            ne_ci95_lo_m3=opt_f("ne_ci95_lo_m3"),
+            ne_ci95_hi_m3=opt_f("ne_ci95_hi_m3"),
+            ne_ci_method=opt_s("ne_ci_method"),
+            ne_ci_note=opt_s("ne_ci_note"),
         )
 
     def as_csv_row(self) -> str:
@@ -185,8 +212,15 @@ class TripleDataset:
                 for k, v in meta.items():
                     fh.write(f"# {k}: {v}\n")
             # If the dataset has homogeneous context, expose it in the
-            # header so the per-row section stays flat.
-            for ctx in ("species", "area_m2", "mi_kg"):
+            # header so the per-row section stays flat.  The n_e CI
+            # ingredients (mi_rel_unc + method/note) are also written
+            # here when uniform, mirroring the ion-composition audit
+            # trail that Single / Double already persist via
+            # ``LPMeasurementWindow._build_meta``.
+            for ctx in (
+                "species", "area_m2", "mi_kg",
+                "mi_rel_unc", "ne_ci_method", "ne_ci_note",
+            ):
                 vals = {getattr(s, ctx) for s in self.samples
                         if getattr(s, ctx) is not None}
                 if len(vals) == 1:
@@ -225,6 +259,10 @@ def csv_columns() -> tuple[str, ...]:
 
 def required_field_names() -> tuple[str, ...]:
     """Return the required (non-context) TripleSample field names."""
-    optional = {"species", "area_m2", "mi_kg", "samples"}
+    optional = {
+        "species", "area_m2", "mi_kg", "samples",
+        "mi_rel_unc", "ne_ci95_lo_m3", "ne_ci95_hi_m3",
+        "ne_ci_method", "ne_ci_note",
+    }
     return tuple(f.name for f in fields(TripleSample)
                  if f.name not in optional)

@@ -92,12 +92,18 @@ class TestGasMixWiring:
                 {"gas": "", "flow_sccm": 0.0},
             ]
         }
-        label, mi_kg = lp_main._build_lp_gas_context()
+        # Contract: _build_lp_gas_context now returns a 3-tuple
+        # (label, m_i_kg, m_i_rel_unc).  The rel-unc slot is 0 for
+        # monatomic / inert gases; any composition-mode widening on
+        # molecular gases flows through the third element.
+        label, mi_kg, mi_rel_unc = lp_main._build_lp_gas_context()
         assert "Ar" in label and "Xe" in label
         assert "sccm" in label
         # Ar 39.948 + Xe 131.293, equal flow → mean ≈ 85.6 u → kg
         expected = (39.948 + 131.293) / 2 * 1.6605e-27
         assert mi_kg == pytest.approx(expected, rel=1e-3)
+        # Monatomic-only mix has no ion-composition ambiguity.
+        assert mi_rel_unc == pytest.approx(0.0, abs=1e-9)
 
     def test_default_when_no_flow_falls_back_to_argon(self, lp_main):
         lp_main._experiment_params = {
@@ -106,9 +112,10 @@ class TestGasMixWiring:
                 {"gas": "", "flow_sccm": 0.0},
             ]
         }
-        label, mi_kg = lp_main._build_lp_gas_context()
+        label, mi_kg, mi_rel_unc = lp_main._build_lp_gas_context()
         assert label == "Argon (Ar)"
         assert mi_kg is None  # worker resolves via species_name fallback
+        assert mi_rel_unc == pytest.approx(0.0, abs=1e-9)
 
     def test_open_triple_forwards_gas_context_to_lp_window(self, qapp):
         from LPmeasurement import LPMainWindow

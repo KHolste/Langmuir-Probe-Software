@@ -256,6 +256,55 @@ def compute_ne_m3(
     return (-i_a) * corr / denom
 
 
+def compute_ne_ci_m3(
+    n_e_m3: float,
+    mi_rel_unc: float,
+) -> dict:
+    """Mass-only 95 % CI for the Triple-probe density.
+
+    Triple has no fit residual for Te per tick (Te is an algebraic
+    solve of V_d12 / V_d13), so the only ingredient available for
+    a per-tick n_e uncertainty is the ion-mass rel-unc coming from
+    the ion-composition context.  Since ``n_e ∝ 1/√m_i``,
+    ``(σ_n/n)² = ¼ · (σ_m/m)²`` and the CI is ``n_e ± 1.96·σ_n``.
+
+    Returns a dict with keys that mirror Single / Double naming:
+    ``ne_ci95_lo_m3``, ``ne_ci95_hi_m3``, ``ne_ci_method``,
+    ``ne_ci_note``, ``ne_ci_m_i_rel_unc``.  When ``mi_rel_unc`` is
+    zero / non-finite, or when ``n_e`` itself is not finite / ≤ 0,
+    the CI is marked ``unavailable`` and the bounds are ``None`` —
+    a false-tight silence would mislead the operator.
+    """
+    try:
+        rel = max(0.0, float(mi_rel_unc))
+    except (TypeError, ValueError):
+        rel = 0.0
+    if not math.isfinite(rel):
+        rel = 0.0
+
+    out: dict = {
+        "ne_ci95_lo_m3": None,
+        "ne_ci95_hi_m3": None,
+        "ne_ci_method": "unavailable",
+        "ne_ci_note": "fit_only",
+        "ne_ci_m_i_rel_unc": rel,
+    }
+    if rel <= 0.0:
+        return out
+    if not math.isfinite(n_e_m3) or n_e_m3 <= 0.0:
+        return out
+
+    # (σ_n/n)² = ¼·(σ_m/m)² — see module docstring.
+    sigma_n = n_e_m3 * 0.5 * rel
+    out["ne_ci95_lo_m3"] = float(n_e_m3 - 1.96 * sigma_n)
+    out["ne_ci95_hi_m3"] = float(n_e_m3 + 1.96 * sigma_n)
+    out["ne_ci_method"] = "covariance"
+    # Triple has no fit-based σ_T per tick, so the honest scope is
+    # "ion_mix" only — not "fit+ion_mix" like Single / Double.
+    out["ne_ci_note"] = "ion_mix"
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Convenience wrapper for a single triple-probe sample
 # ---------------------------------------------------------------------------
@@ -268,15 +317,23 @@ def analyze_sample(
     mi_kg: Optional[float] = None,
     species_name: str = DEFAULT_SPECIES,
     prefer_eq10: bool = True,
+    mi_rel_unc: float = 0.0,
 ) -> dict:
-    """Reduce one triple-probe sample to ``{Te_eV, n_e_m3}``.
+    """Reduce one triple-probe sample to ``{Te_eV, n_e_m3, …CI}``.
 
-    A future Triple-Probe worker can call this once per tick and feed
-    the result straight into a time-series plot or CSV row.  ``mi_kg``
+    A Triple-Probe worker calls this once per tick and feeds the
+    result straight into a time-series plot or CSV row.  ``mi_kg``
     overrides the species lookup when given (use this for gas mixes).
+
+    When ``mi_rel_unc > 0`` the result dict also carries the
+    mass-only 95 % CI on ``n_e`` — same key names Single and Double
+    use.  When ``mi_rel_unc == 0`` the CI is ``unavailable`` and
+    the bounds are ``None`` (never a false-tight zero).
     """
     if mi_kg is None:
         mi_kg = mi_from_species(species_name)
     te = compute_te_ev(v_d12, v_d13, prefer_eq10=prefer_eq10)
     ne = compute_ne_m3(i_measure_a, te, v_d13, area_m2, mi_kg)
-    return {"Te_eV": te, "n_e_m3": ne}
+    result: dict = {"Te_eV": te, "n_e_m3": ne}
+    result.update(compute_ne_ci_m3(ne, mi_rel_unc))
+    return result

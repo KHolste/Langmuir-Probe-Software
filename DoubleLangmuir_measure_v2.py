@@ -1115,6 +1115,15 @@ class DLPMainWindowV2(DLPMainWindow):
             self, "_ni_probe_area_rel_unc_pct", 0.0)) / 100.0
         _mass_rel = float(getattr(
             self, "_ni_ion_mass_rel_unc_pct", 0.0)) / 100.0
+        # Operator-selected ion-composition mode lives at the top of
+        # ``experiment_params`` (written by the Experiment dialog's
+        # new ion-composition combo).  Defaults to "molecular" so
+        # pre-existing presets behave as before.
+        _ion_mode = str(self._experiment_params.get(
+            "ion_composition_mode", "molecular"))
+        _ion_x = float(self._experiment_params.get("x_atomic", 0.0))
+        _ion_dx = float(
+            self._experiment_params.get("x_atomic_unc", 0.0))
         result = compute_double_analysis(
             V, I, fit_model=self._fit_model, sat_fraction=frac,
             probe_params=self._probe_params,
@@ -1124,7 +1133,10 @@ class DLPMainWindowV2(DLPMainWindow):
             bootstrap_enabled=bootstrap_enabled,
             bootstrap_n_iters=bootstrap_n_iters,
             probe_area_rel_unc=_area_rel,
-            ion_mass_rel_unc=_mass_rel)
+            ion_mass_rel_unc=_mass_rel,
+            ion_composition_mode=_ion_mode,
+            ion_x_atomic=_ion_x,
+            ion_x_atomic_unc=_ion_dx)
         # Expose the compliance summary so the LP override can
         # render it in the compact HTML without re-computing.
         self._last_compliance_info = result.get("compliance_info")

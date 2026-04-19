@@ -48,6 +48,7 @@ REQUIRED_LOCAL = [
     'dlp_double_help',
     'dlp_double_options',
     'dlp_experiment_dialog',
+    'dlp_experiment_help',
     'dlp_k2000_options',
     'dlp_fit_models',
     'dlp_instrument_dialog',
@@ -66,6 +67,7 @@ REQUIRED_LOCAL = [
     'dlp_triple_window',
     'dlp_triple_worker',
     'interface_discovery',
+    'ion_composition_presets',
 ]
 
 HIDDEN = [
