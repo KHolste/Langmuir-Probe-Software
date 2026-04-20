@@ -44,29 +44,40 @@ def _make_legacy(base_dir):
 
 
 # ---------------------------------------------------------------------------
-class TestMigrateButtonInstalled:
-    def test_button_present_after_init(self, qapp):
+class TestMigrateActionInstalled:
+    """Migrate Legacy Data is reachable via the Tools menu.  The
+    previous plot-header button was removed to declutter the main
+    column \u2014 all access now goes through the menu entry so
+    discoverability follows standard GUI conventions."""
+
+    def test_action_present_in_tools_menu(self, qapp):
         from LPmeasurement import LPMainWindow
         win = LPMainWindow()
         try:
-            assert hasattr(win, "btnMigrateLegacy")
-            btn = win.btnMigrateLegacy
-            assert btn.text().startswith("Migrate Legacy")
-            # Must live in the same parent layout as the Plot button
-            # — i.e. plot-header row.  Validate by asking Qt for
-            # a common parent widget.
-            assert btn.parent() is win.btnPlotSettings.parent()
+            assert hasattr(win, "_actMigrate")
+            act = win._actMigrate
+            txt = act.text().replace("&", "")
+            assert "Migrate" in txt and "legacy" in txt.lower()
+            # Must be installed under the Tools menu, not floating.
+            mbar = win.menuBar()
+            tools_menu = None
+            for ma in mbar.actions():
+                if ma.text().replace("&", "") == "Tools":
+                    tools_menu = ma.menu()
+                    break
+            assert tools_menu is not None
+            assert act in tools_menu.actions()
         finally:
             win.close()
 
-    def test_button_click_is_connected(self, qapp):
+    def test_action_trigger_is_connected(self, qapp):
         from LPmeasurement import LPMainWindow
         win = LPMainWindow()
         try:
             calls = {"open": False}
             with patch.object(win, "_open_migrate_legacy_dialog",
                               lambda: calls.update({"open": True})):
-                win.btnMigrateLegacy.clicked.emit()
+                win._actMigrate.trigger()
                 assert calls["open"]
         finally:
             win.close()

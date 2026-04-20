@@ -37,6 +37,11 @@ _V_MIN, _V_MAX = -1000.0, 0.0     # only negative bias allowed
 _DUR_MIN, _DUR_MAX = 0.1, 3600.0  # seconds
 _I_MIN, _I_MAX = 1e-6, 3.0        # amps (B2901 hardware ceiling)
 
+#: B2901 continuous-power envelope the JLU-IPI bench operates under.
+#: 21 W = 210 V × 100 mA; exceeding this will damage the instrument.
+#: Override via the ``max_power_w`` kwarg on :class:`CleaningDialog`.
+_DEFAULT_MAX_POWER_W = 21.0
+
 #: How often the live update + countdown ticks.
 _TICK_MS = 100
 
@@ -54,6 +59,7 @@ class CleaningDialog(QDialog):
         duration_s: float = 10.0,
         voltage_v: float = -100.0,
         current_limit_a: float = 0.1,
+        max_power_w: float = _DEFAULT_MAX_POWER_W,
     ) -> None:
         super().__init__(parent)
         self.setWindowTitle("Probe Cleaning")
@@ -64,6 +70,7 @@ class CleaningDialog(QDialog):
         self._sim_current = (
             float(sim_current_a) if sim_current_a is not None else None)
         self._prev_output_low = str(prev_output_low or "GRO").upper()
+        self._max_power_w = float(max_power_w)
         self._running = False
         self._duration_ms = 0
         self._elapsed = QElapsedTimer()
@@ -103,7 +110,24 @@ class CleaningDialog(QDialog):
         self.spnCurrentLimit.setSuffix(" A")
         self.spnCurrentLimit.setValue(float(current_limit_a))
         fl.addRow("Current limit:", self.spnCurrentLimit)
+
+        # Live power-envelope indicator — shows |V| \u00d7 I against
+        # the B2901's continuous-power limit (21 W by default).  Red
+        # text + disabled Start button signal that the chosen settings
+        # would exceed the rating and damage the SMU if applied.
+        self.lblPower = QLabel("")
+        self.lblPower.setToolTip(
+            f"SMU continuous-power envelope: |V| \u00d7 I must stay at "
+            f"or below {self._max_power_w:.1f} W.  Exceeding this "
+            "damages the B2901 \u2014 Start is refused while the "
+            "figure is red.")
+        fl.addRow("SMU power:", self.lblPower)
         layout.addWidget(grp_par)
+        # Re-check on every edit so the operator never sees a stale
+        # power figure.
+        self.spnVoltage.valueChanged.connect(self._refresh_power_safety)
+        self.spnCurrentLimit.valueChanged.connect(
+            self._refresh_power_safety)
 
         # ── Live readback ───────────────────────────────────────────
         grp_live = QGroupBox("Live")
@@ -131,6 +155,10 @@ class CleaningDialog(QDialog):
         row.addWidget(self.btnStop)
         layout.addLayout(row)
 
+        # Initial power-safety render so the label + Start state are
+        # correct before the user touches anything.
+        self._refresh_power_safety()
+
         # ── Close button ────────────────────────────────────────────
         btns = QDialogButtonBox(QDialogButtonBox.StandardButton.Close)
         btns.rejected.connect(self.reject)
@@ -153,6 +181,52 @@ class CleaningDialog(QDialog):
         return self._running
 
     # ------------------------------------------------------------------
+    # Power-envelope interlock
+    # ------------------------------------------------------------------
+    def _power_safety_status(self) -> tuple[float, bool, str]:
+        """Return (power_w, ok, reason).  ``ok`` is False when the
+        |V| \u00d7 I product exceeds ``self._max_power_w``.
+        """
+        try:
+            v = abs(float(self.spnVoltage.value()))
+            i = float(self.spnCurrentLimit.value())
+        except Exception:
+            return (0.0, True, "")
+        p = v * i
+        if p > self._max_power_w + 1e-9:
+            return (p,
+                    False,
+                    (f"|V|\u00b7I = {p:.2f} W exceeds the "
+                     f"{self._max_power_w:.1f} W SMU envelope."))
+        return (p, True, "")
+
+    @Slot()
+    def _refresh_power_safety(self, *_args) -> None:
+        """Update the power label + Start button availability whenever
+        the operator edits voltage or current limit."""
+        p, ok, reason = self._power_safety_status()
+        base = (f"{p:.2f} W / {self._max_power_w:.1f} W max")
+        if ok:
+            self.lblPower.setText(base)
+            self.lblPower.setStyleSheet(
+                "font-family: Consolas, monospace; color: #5ccf8a;")
+        else:
+            self.lblPower.setText(f"\u26a0 {base}")
+            self.lblPower.setStyleSheet(
+                "font-family: Consolas, monospace; color: #f06060; "
+                "font-weight: 600;")
+        # Only gate the Start button while idle; during a run, Stop
+        # must stay reachable regardless of the live power read.
+        if not self._running:
+            self.btnStart.setEnabled(ok)
+            if not ok:
+                self.btnStart.setToolTip(
+                    f"Start refused: {reason}  Reduce voltage or "
+                    "current limit.")
+            else:
+                self.btnStart.setToolTip("")
+
+    # ------------------------------------------------------------------
     # Start / Stop
     # ------------------------------------------------------------------
     @Slot()
@@ -165,6 +239,18 @@ class CleaningDialog(QDialog):
             return
         dur = float(self.spnDuration.value())
         i_lim = float(self.spnCurrentLimit.value())
+
+        # Hard power-envelope interlock.  Checked here even though the
+        # Start button is already disabled on the same condition \u2014
+        # the extra layer protects against programmatic clicks (e.g.
+        # scripted tests) that bypass the live-validation gate.
+        p, ok, reason = self._power_safety_status()
+        if not ok:
+            self._log(
+                f"Cleaning REFUSED (safety): {reason}  "
+                f"Requested V={v:+.2f} V, I_max={i_lim:.4g} A.",
+                "error")
+            return
 
         # Force GND-referenced output for the cleaning run; previous
         # low-terminal mode is restored in _shutdown().

@@ -39,9 +39,10 @@ class TestThreeColumns:
         left = win._splitter_main.widget(0)
         groups = [g for g in left.findChildren(QGroupBox)]
         assert groups, "left column has no group boxes"
-        # Output group exists and the folder label lives in it.
+        # Main save folder group exists (formerly titled "Output" —
+        # renamed for UX clarity in the shared-save-path refactor).
         titles = [g.title() for g in groups]
-        assert "Output" in titles
+        assert any("Main save folder" in t for t in titles), titles
         # And the K2000 group is NOT in the left column anymore.
         assert "Multimeter (Keithley 2000)" not in titles
 
@@ -53,19 +54,26 @@ class TestThreeColumns:
         canvases = plot_widget.findChildren(FigureCanvasQTAgg)
         assert len(canvases) == 1
 
-    def test_column_three_has_k2000_on_top_and_log_below(self, qapp):
+    def test_column_three_has_k2000_control_and_log(self, qapp):
         from PySide6.QtCore import Qt
         from PySide6.QtWidgets import QGroupBox, QSplitter, QTextEdit
         win = _make()
         third = win._splitter_main.widget(2)
         assert isinstance(third, QSplitter)
         assert third.orientation() == Qt.Orientation.Vertical
-        assert third.count() == 2
-        top, bottom = third.widget(0), third.widget(1)
+        # Third column now carries three stacked panels:
+        # K2000 on top, Control in the middle, Log at the bottom.
+        # Control was moved out of the left column to free vertical
+        # space so every left-column group fits in a Full-HD viewport.
+        assert third.count() == 3
+        top, middle, bottom = (third.widget(0), third.widget(1),
+                                 third.widget(2))
         assert isinstance(top, QGroupBox)
         assert top.title() == "Multimeter (Keithley 2000)"
-        # Bottom is now a small wrapper that holds a 'Log' heading
-        # plus the actual log widget.
+        assert isinstance(middle, QGroupBox)
+        assert middle.title() == "Control"
+        # Bottom is a small wrapper that holds a 'Log' heading plus
+        # the actual log widget.
         assert win.txtLog in bottom.findChildren(QTextEdit)
 
     def test_third_column_handle_is_attribute(self, qapp):

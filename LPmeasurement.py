@@ -270,6 +270,13 @@ class LPMainWindow(DLPMainWindowV2):
         super().__init__()
         self.setWindowTitle("Langmuir Probe Measurement")
 
+        # Theme tracking — the base class applied DARK_THEME during
+        # its own __init__; we mirror that here so the View menu's
+        # checkable entries can reflect the initial state.  A saved
+        # preference (if any) is applied further down once the menu
+        # bar widgets exist.
+        self._theme_name: str = "dark"
+
         self.k2000 = None  # Keithley2000DMM | FakeKeithley2000 | None
         grp_k2000 = self._build_k2000_groupbox()
         if grp_k2000 is not None:
@@ -365,6 +372,12 @@ class LPMainWindow(DLPMainWindowV2):
             self.btnStart.clicked.connect(self._clear_single_overlays)
         except Exception:
             pass
+        # Drop the plot legend on every Start click so a previous
+        # analysis' legend does not linger over a fresh sweep.
+        try:
+            self.btnStart.clicked.connect(self._clear_plot_legend)
+        except Exception:
+            pass
 
         # ── Load CSV + Migrate-Legacy buttons (next to Plot…) ──────
         # Adds two small action buttons to the existing plot-header
@@ -376,13 +389,765 @@ class LPMainWindow(DLPMainWindowV2):
             self._install_load_csv_button()
         except Exception as exc:
             log.warning("Load-CSV button install failed: %s", exc)
-        try:
-            self._install_migrate_legacy_button()
-        except Exception as exc:
-            log.warning("Migrate-Legacy button install failed: %s", exc)
+        # Migrate Legacy Data is now reachable via Tools menu only
+        # (see _build_tools_menu).  The previous plot-header button
+        # was removed to declutter the main column.
         # Non-invasive startup hint when legacy data is still around.
         try:
             self._announce_legacy_data_if_present()
+        except Exception:
+            pass
+
+        # ── Main save path (persistent, shared by all probe types) ──
+        # Load the operator-chosen base folder from the persistence
+        # layer and apply it to the inherited Output group so every
+        # Single / Double / Triple save lands under the same root.
+        # Per-method subfolders are created on demand by dlp_save_paths.
+        self._install_main_save_path()
+
+        # ── Keyboard shortcuts for the most common bench actions ─────
+        # F5 / Esc / Ctrl+S so the operator can drive a sweep without
+        # reaching for the mouse.  The shortcuts are button-scoped
+        # (via QAbstractButton.setShortcut) so they naturally respect
+        # the enabled state — Esc only stops a running sweep, F5 only
+        # starts when Start is enabled.  Ctrl+S is bound on the Save
+        # parameters action in the File menu (see _build_file_menu).
+        self._install_action_shortcuts()
+
+        # Unit suffixes on the inherited sweep spin boxes.  The V1
+        # labels ("V_start (V):", ...) already carry the unit, but the
+        # suffix stays visible while the operator scrolls / copies the
+        # value — and unambiguously tells new users what the number
+        # means on its own.
+        self._install_sweep_spinbox_suffixes()
+
+        # Live sweep-parameter validation: surface V_start / V_stop /
+        # V_step problems while the operator types, not only at Start.
+        self._install_sweep_validation()
+
+        # Permanent status bar — continuously surfaces SMU / K2000
+        # connection state, active method, the main save folder, and
+        # the app version so the operator never has to hunt that info
+        # through individual dialogs.
+        self._install_status_bar()
+
+        # Log-panel controls: Export\u2026 + level filter combo.  Must
+        # come after the three-column layout exists because it inserts
+        # into the log-box header built there.
+        self._install_log_controls()
+
+        # ── Persistent UI state (theme, window geometry) ─────────────
+        # Applied late so every widget already exists and is laid out
+        # at the base size; restoreGeometry then expands to whatever
+        # the operator chose in the previous session.  Theme is
+        # applied last because it triggers a stylesheet replacement
+        # that implicitly re-paints every child widget.
+        self._install_ui_state()
+
+    # ------------------------------------------------------------------
+    # Log panel — history tracking, level filter, CSV export
+    # ------------------------------------------------------------------
+    #: Filter presets for the log-level combo.  Each value is a set of
+    #: levels that should remain visible after re-rendering.  "all"
+    #: keeps every entry (``None`` sentinel).
+    _LOG_FILTER_PRESETS: dict = {
+        "all":    None,
+        "warn+":  {"warn", "error"},
+        "error":  {"error"},
+    }
+
+    def _install_log_controls(self) -> None:
+        """Add a small control row above the log view: filter combo +
+        Export\u2026 button.  Also installs the history-tracking patch
+        on :func:`utils.append_log` so the filter can re-render and
+        the export target carries timestamps + levels as plain text.
+        """
+        self._log_history: list[tuple[str, str, str]] = []
+        self._log_filter: str = "all"
+        self._patch_append_log_for_history()
+
+        log_box = getattr(self, "_log_box", None)
+        if log_box is None:
+            return
+        layout = log_box.layout()
+        if layout is None:
+            return
+
+        # Replace the plain "Log" QLabel row with a header that carries
+        # the filter + export affordances.  The old QLabel stays in
+        # place as the section title so the visual hierarchy is intact.
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(6)
+        row.addWidget(self.lblLog)
+        row.addStretch(1)
+        row.addWidget(QLabel("Show:"))
+        self.cmbLogFilter = QComboBox()
+        self.cmbLogFilter.addItem("All", "all")
+        self.cmbLogFilter.addItem("Warnings + errors", "warn+")
+        self.cmbLogFilter.addItem("Errors only", "error")
+        self.cmbLogFilter.setCurrentIndex(0)
+        self.cmbLogFilter.setToolTip(
+            "Filter the log view by minimum level.  History is kept "
+            "in full \u2014 switching back to 'All' re-shows every "
+            "entry.")
+        self.cmbLogFilter.currentIndexChanged.connect(
+            self._on_log_filter_changed)
+        row.addWidget(self.cmbLogFilter)
+        self.btnLogExport = QPushButton("Export\u2026")
+        self.btnLogExport.setMaximumWidth(80)
+        self.btnLogExport.setToolTip(
+            "Save the full log history to a text file with timestamps "
+            "and levels.  Filtering does not affect the export \u2014 "
+            "every entry ever emitted in this session is written.")
+        self.btnLogExport.clicked.connect(self._export_log_to_file)
+        row.addWidget(self.btnLogExport)
+
+        # Insert the header row in place of the plain label.  QLabel
+        # is already a child of the layout at index 0; remove it from
+        # the layout and re-add via the new row widget.
+        try:
+            layout.removeWidget(self.lblLog)
+        except Exception:
+            pass
+        layout.insertLayout(0, row)
+
+    def _patch_append_log_for_history(self) -> None:
+        """Wrap :func:`utils.append_log` so every call also appends to
+        ``window._log_history`` when the target window carries one.
+        Idempotent: re-running on the same process is a no-op.
+
+        Modules that did ``from utils import append_log`` hold their
+        own reference to the original function, so the patch also
+        re-binds those attributes for known importing modules.
+        """
+        import sys
+        import utils as _u
+        if getattr(_u.append_log, "_lp_history_wrapped", False):
+            return
+        original = _u.append_log
+
+        def _wrapped(window, text, level="info"):
+            original(window, text, level)
+            hist = getattr(window, "_log_history", None)
+            if isinstance(hist, list):
+                from datetime import datetime
+                hist.append(
+                    (datetime.now().strftime("%H:%M:%S"),
+                     str(level), str(text)))
+                # Prune in chunks so we don't drop one entry per call.
+                if len(hist) > 2000:
+                    del hist[:500]
+
+        _wrapped._lp_history_wrapped = True
+        _u.append_log = _wrapped
+        for mod in list(sys.modules.values()):
+            if mod is _u or mod is None:
+                continue
+            try:
+                attr = getattr(mod, "append_log", None)
+            except Exception:
+                continue
+            if attr is original:
+                try:
+                    setattr(mod, "append_log", _wrapped)
+                except Exception:
+                    pass
+
+    @Slot(int)
+    def _on_log_filter_changed(self, _index: int) -> None:
+        try:
+            self._log_filter = self.cmbLogFilter.currentData() or "all"
+        except Exception:
+            self._log_filter = "all"
+        self._rerender_log_from_history()
+
+    def _rerender_log_from_history(self) -> None:
+        """Repopulate ``self.txtLog`` from the persisted history using
+        the currently-selected level filter.  Preserves the themed
+        colour scheme that :func:`utils.append_log` uses so filtered
+        entries stay visually consistent with fresh appends."""
+        txt = getattr(self, "txtLog", None)
+        if txt is None:
+            return
+        allowed = self._LOG_FILTER_PRESETS.get(self._log_filter)
+        import html as _html
+        _fallback = {"log_info": "#ffffff", "log_ok": "#00ff7f",
+                     "log_warn": "#ffd166", "log_error": "#ff6b6b",
+                     "log_stamp": "#888888"}
+        t = getattr(self, "_theme", None) or _fallback
+        level_map = {"info": "log_info", "ok": "log_ok",
+                     "warn": "log_warn", "error": "log_error"}
+        stamp_color = t.get("log_stamp", _fallback["log_stamp"])
+        txt.clear()
+        for stamp, level, text in self._log_history:
+            if allowed is not None and level not in allowed:
+                continue
+            color = t.get(level_map.get(level, "log_info"),
+                          _fallback["log_info"])
+            line = (
+                f'<span style="color:{stamp_color}">[{stamp}]</span> '
+                f'<span style="color:{color}">'
+                f'{_html.escape(text)}</span>')
+            txt.append(line)
+
+    @Slot()
+    def _export_log_to_file(self) -> None:
+        """Save the full in-memory log history (not the filtered view)
+        to a plain-text file chosen by the operator.  Includes
+        timestamps and level tags so the file is directly useful for
+        bug reports."""
+        from PySide6.QtWidgets import QFileDialog
+        from datetime import datetime
+        from pathlib import Path as _P
+        default_name = (
+            "lp_log_"
+            + datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+            + ".txt")
+        default_dir = str(getattr(self, "_save_folder", "")) or ""
+        start = str(_P(default_dir) / default_name) if default_dir \
+            else default_name
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export log", start, "Text files (*.txt);;All files (*)")
+        if not path:
+            return
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                for stamp, level, text in self._log_history:
+                    f.write(f"[{stamp}] [{level:>5}] {text}\n")
+            append_log(self, f"Log exported: {path}", "ok")
+        except Exception as exc:
+            append_log(self, f"Log export failed: {exc}", "error")
+
+    # ------------------------------------------------------------------
+    # Persistent status bar — SMU / K2000 / method / save path / version
+    # ------------------------------------------------------------------
+    def _install_status_bar(self) -> None:
+        """Create the four permanent status-bar slots and push an
+        initial render.  Slots are plain QLabels so later updates are
+        cheap text replacements; the widget already carries theme
+        styling via the main stylesheet.
+        """
+        sb = self.statusBar()
+        if sb is None:
+            return
+        self._sb_smu = QLabel("SMU: \u2014")
+        self._sb_k2000 = QLabel("K2000: \u2014")
+        self._sb_method = QLabel("Method: \u2014")
+        self._sb_save = QLabel("Save: \u2014")
+        self._sb_version = QLabel("")
+        for lbl in (self._sb_smu, self._sb_k2000, self._sb_method,
+                     self._sb_save, self._sb_version):
+            lbl.setStyleSheet("padding: 0 8px;")
+        sb.addPermanentWidget(self._sb_smu)
+        sb.addPermanentWidget(self._sb_k2000)
+        sb.addPermanentWidget(self._sb_method)
+        sb.addPermanentWidget(self._sb_save, 1)   # stretch slot
+        sb.addPermanentWidget(self._sb_version)
+        try:
+            self._sb_version.setText(f"v{self._resolve_app_version()}")
+        except Exception:
+            pass
+        self._refresh_status_bar()
+
+    def _refresh_status_bar(self) -> None:
+        """Re-render each status-bar slot from the current window
+        state.  Safe to call before the widgets exist (tests that
+        stub pieces of the main window): the missing-slot guards
+        keep it best-effort."""
+        # SMU
+        try:
+            if self.smu is None:
+                text, color = "SMU: disconnected", "#c0c8d8"
+            else:
+                idn = (self.lblIdn.text() if hasattr(self, "lblIdn")
+                       else "") or "connected"
+                short = idn.split(",")[1].strip() if "," in idn else idn
+                text, color = f"SMU: {short}", self._theme["led_green"]
+            if hasattr(self, "_sb_smu"):
+                self._sb_smu.setText(text)
+                self._sb_smu.setStyleSheet(
+                    f"padding: 0 8px; color: {color};")
+                self._sb_smu.setToolTip(
+                    self.lblIdn.text() if hasattr(self, "lblIdn") else "")
+        except Exception:
+            pass
+        # K2000
+        try:
+            if self.k2000 is None:
+                text, color = "K2000: disconnected", "#c0c8d8"
+            else:
+                idn = (self.lblK2000Idn.text()
+                       if hasattr(self, "lblK2000Idn") else "") or "connected"
+                short = idn.split(",")[1].strip() if "," in idn else idn
+                text, color = f"K2000: {short}", self._theme["led_green"]
+            if hasattr(self, "_sb_k2000"):
+                self._sb_k2000.setText(text)
+                self._sb_k2000.setStyleSheet(
+                    f"padding: 0 8px; color: {color};")
+                self._sb_k2000.setToolTip(
+                    self.lblK2000Idn.text()
+                    if hasattr(self, "lblK2000Idn") else "")
+        except Exception:
+            pass
+        # Method
+        try:
+            method = self._current_active_method()
+            if hasattr(self, "_sb_method"):
+                self._sb_method.setText(
+                    f"Method: {method.capitalize()}")
+        except Exception:
+            pass
+        # Save path — truncated with full path in tooltip.
+        try:
+            folder = getattr(self, "_save_folder", None)
+            if folder is not None and hasattr(self, "_sb_save"):
+                short = self._shorten_path_for_menu(str(folder), 50)
+                self._sb_save.setText(f"Save: {short}")
+                self._sb_save.setToolTip(str(folder))
+        except Exception:
+            pass
+
+    # ------------------------------------------------------------------
+    # Persistent UI state (theme + geometry)
+    # ------------------------------------------------------------------
+    def _install_ui_state(self) -> None:
+        """Load persisted UI state (theme, window geometry, splitter
+        positions) and apply it to the live window.  Any missing /
+        unreadable entry silently falls back to the base-class default.
+
+        Skipped under ``QT_QPA_PLATFORM=offscreen`` (headless tests) so
+        the layout tests see the deterministic splitter seed sizes the
+        build code sets, not a developer-machine state that happens to
+        be on disk.
+        """
+        import os as _os
+        if _os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+            return
+        try:
+            from paths import load_ui_state
+            state = load_ui_state()
+        except Exception:
+            state = {}
+        # Theme: apply BEFORE restoring geometry so the stylesheet
+        # changes do not trigger a redundant relayout of a restored
+        # window.  persist=False avoids writing the loaded value back
+        # as if the user had just toggled it.
+        theme_name = state.get("theme")
+        if theme_name in ("dark", "light") and theme_name != self._theme_name:
+            try:
+                self._apply_theme_by_name(theme_name, persist=False)
+            except Exception:
+                pass
+        # Window geometry.  QByteArray comes through json as a base64
+        # ASCII string; QByteArray.fromBase64 handles an empty input
+        # gracefully.
+        geom = state.get("window_geometry")
+        if isinstance(geom, str) and geom:
+            try:
+                from PySide6.QtCore import QByteArray
+                self.restoreGeometry(
+                    QByteArray.fromBase64(geom.encode("ascii")))
+            except Exception:
+                pass
+        # Main horizontal splitter (three columns: controls / plot /
+        # K2000+log).  We restore only the object we know how to look
+        # up — the inner vertical splitter ("splitThird") is restored
+        # via a separate entry so a re-ordered splitter layout does
+        # not silently wreck state from an older build.
+        split_main = state.get("splitter_main")
+        sp = getattr(self, "_splitter_main", None)
+        if sp is not None and isinstance(split_main, str) and split_main:
+            try:
+                from PySide6.QtCore import QByteArray
+                sp.restoreState(
+                    QByteArray.fromBase64(split_main.encode("ascii")))
+            except Exception:
+                pass
+        split_third = state.get("splitter_third")
+        st = getattr(self, "_splitter_third", None)
+        if st is not None and isinstance(split_third, str) and split_third:
+            try:
+                from PySide6.QtCore import QByteArray
+                st.restoreState(
+                    QByteArray.fromBase64(split_third.encode("ascii")))
+            except Exception:
+                pass
+
+    def _collect_ui_state(self) -> dict:
+        """Snapshot the persistable UI state into a plain dict."""
+        state: dict = {"theme": self._theme_name}
+        try:
+            geom_ba = self.saveGeometry()
+            state["window_geometry"] = bytes(
+                geom_ba.toBase64()).decode("ascii")
+        except Exception:
+            pass
+        sp = getattr(self, "_splitter_main", None)
+        if sp is not None:
+            try:
+                state["splitter_main"] = bytes(
+                    sp.saveState().toBase64()).decode("ascii")
+            except Exception:
+                pass
+        st = getattr(self, "_splitter_third", None)
+        if st is not None:
+            try:
+                state["splitter_third"] = bytes(
+                    st.saveState().toBase64()).decode("ascii")
+            except Exception:
+                pass
+        return state
+
+    def _apply_theme_by_name(self, name: str, *, persist: bool = True) -> None:
+        """Switch the active window theme at runtime.
+
+        Re-applies the stylesheet, updates the in-memory ``_theme``
+        palette so subsequent ``append_log`` calls pick up the new
+        log colours, and re-seats LED / compliance-LED colours that
+        were tied to the previous palette.  Optionally persists the
+        choice to the UI-state file so the next start reuses it.
+        """
+        from theme import DARK_THEME, LIGHT_THEME, build_stylesheet
+        t = DARK_THEME if name == "dark" else LIGHT_THEME
+        self._theme = t
+        self._theme_name = name
+        try:
+            self.setStyleSheet(build_stylesheet(t))
+        except Exception:
+            pass
+        # Re-seat the LED colours so they match the new palette's
+        # led_grey / led_green values instead of the previous theme's.
+        for attr, state_attr, green_key in (
+            ("ledConn",   None,                "led_green"),
+            ("ledK2000",  None,                "led_green"),
+        ):
+            led = getattr(self, attr, None)
+            if led is None:
+                continue
+            # Derive the right colour from the current logical state
+            # (connected / idle) rather than assuming a fresh idle.
+            try:
+                if attr == "ledConn":
+                    connected = self.smu is not None
+                elif attr == "ledK2000":
+                    connected = self.k2000 is not None
+                else:
+                    connected = False
+                set_led(led,
+                        t[green_key] if connected else t["led_grey"])
+            except Exception:
+                pass
+        if persist:
+            try:
+                from paths import load_ui_state, store_ui_state
+                state = load_ui_state()
+                state["theme"] = name
+                store_ui_state(state)
+            except Exception:
+                pass
+            append_log(self, f"Theme switched to '{name}'.", "info")
+
+    # ------------------------------------------------------------------
+    # Sweep-parameter live validation
+    # ------------------------------------------------------------------
+    #: Inline stylesheet fragment applied to a misconfigured spin box.
+    #: Additive over the themed stylesheet (Qt merges widget-level sheets
+    #: with inherited ones), so it paints the border red without losing
+    #: the theme's text + background colours.
+    _INVALID_FIELD_QSS = (
+        "QDoubleSpinBox { border: 2px solid #e06060; "
+        "border-radius: 4px; }")
+
+    #: Continuous-power envelope of the Keysight B2901 SMU on the
+    #: JLU-IPI bench.  The hardware is damaged above this figure, so
+    #: every path that configures voltage + current compliance runs
+    #: through :meth:`_check_power_safety` before output is enabled.
+    #: 21 W corresponds to 210 V \u00d7 100 mA (the default spinbox
+    #: ceilings).
+    SMU_MAX_POWER_W: float = 21.0
+
+    @classmethod
+    def _check_power_safety(
+            cls, v_abs_max_v: float, i_compl_a: float
+    ) -> tuple[float, bool, str]:
+        """Return ``(power_w, ok, reason)`` for a candidate
+        V-max / I-compliance pair.  Centralised so every entry point
+        (sweep, cleaning, instrument options) uses the same rule and
+        the same error wording.
+        """
+        try:
+            p = float(abs(v_abs_max_v)) * float(i_compl_a)
+        except Exception:
+            return (0.0, True, "")
+        if p > cls.SMU_MAX_POWER_W + 1e-9:
+            return (p,
+                    False,
+                    (f"|V_max|\u00b7I_compl = {p:.2f} W exceeds the "
+                     f"{cls.SMU_MAX_POWER_W:.1f} W SMU envelope."))
+        return (p, True, "")
+
+    def _install_sweep_validation(self) -> None:
+        """Wire valueChanged on V_start / V_stop / V_step / Compliance
+        to :meth:`_validate_sweep_params` so invalid combinations are
+        flagged while the operator edits, and the Start button is
+        disabled until the problem is fixed.
+        """
+        for attr in ("spnVstart", "spnVstop", "spnVstep", "spnCompl",
+                     "spnSettle"):
+            spn = getattr(self, attr, None)
+            if spn is None:
+                continue
+            try:
+                spn.valueChanged.connect(self._validate_sweep_params)
+            except Exception:
+                pass
+        self._validate_sweep_params()
+
+    @Slot()
+    def _validate_sweep_params(self, *_args) -> None:
+        """Tag each sweep field invalid / valid based on cross-field
+        constraints; disable Start when anything is wrong.
+
+        Rules:
+          * V_start must differ from V_stop (otherwise: zero-range sweep)
+          * V_step must be > 0
+          * V_step must not exceed |V_stop - V_start| (otherwise: a
+            single point would be written and the sweep is moot)
+          * Compliance must be > 0
+          * Settle must be > 0
+        """
+        issues: dict[str, str] = {}
+        try:
+            vstart = self.spnVstart.value()
+            vstop = self.spnVstop.value()
+            vstep = self.spnVstep.value()
+        except Exception:
+            return  # spin boxes missing — nothing to validate yet.
+        rng = abs(vstop - vstart)
+        if vstart == vstop:
+            issues["spnVstart"] = ("V_start equals V_stop \u2014 "
+                                   "sweep range is zero.")
+            issues["spnVstop"] = issues["spnVstart"]
+        if vstep <= 0:
+            issues["spnVstep"] = "V_step must be positive."
+        elif rng > 0 and vstep > rng:
+            issues["spnVstep"] = (f"V_step ({vstep:g}) exceeds the "
+                                  f"sweep range ({rng:g}) \u2014 "
+                                  "reduce the step size.")
+        try:
+            if self.spnCompl.value() <= 0:
+                issues["spnCompl"] = "Compliance must be positive."
+        except Exception:
+            pass
+        try:
+            if self.spnSettle.value() <= 0:
+                issues["spnSettle"] = "Settle must be positive."
+        except Exception:
+            pass
+
+        # Power-envelope interlock: |V_max|\u00b7I_compl must stay at
+        # or below SMU_MAX_POWER_W.  The check runs even if other
+        # issues are already present \u2014 a rare double-violation
+        # still surfaces both fields as invalid.
+        try:
+            v_abs_max = max(abs(vstart), abs(vstop))
+            i_compl_a = self.spnCompl.value() / 1000.0  # mA \u2192 A
+            _, ok_power, reason_power = self._check_power_safety(
+                v_abs_max, i_compl_a)
+            if not ok_power:
+                # Highlight whichever single field the operator is
+                # most likely to dial back \u2014 the compliance, then
+                # fall back to the voltage extremum in case compliance
+                # is already at its minimum.
+                issues.setdefault("spnCompl", reason_power)
+                issues.setdefault(
+                    "spnVstart" if abs(vstart) >= abs(vstop) else "spnVstop",
+                    reason_power)
+        except Exception:
+            pass
+
+        for attr in ("spnVstart", "spnVstop", "spnVstep", "spnCompl",
+                     "spnSettle"):
+            spn = getattr(self, attr, None)
+            if spn is None:
+                continue
+            msg = issues.get(attr)
+            try:
+                if msg:
+                    spn.setStyleSheet(self._INVALID_FIELD_QSS)
+                    # Preserve any existing tooltip by appending the
+                    # validation line on a separate bullet.  The "\n\n"
+                    # gap keeps it visually distinct from the meaning
+                    # tooltip the base class set.
+                    base = self._base_tooltip_for(attr)
+                    spn.setToolTip(f"{base}\n\n\u26a0 {msg}")
+                else:
+                    spn.setStyleSheet("")
+                    spn.setToolTip(self._base_tooltip_for(attr))
+            except Exception:
+                pass
+
+        btn_start = getattr(self, "btnStart", None)
+        if btn_start is not None:
+            try:
+                # Keep Start disabled while the worker is running
+                # (the base class manages that) \u2014 only this class
+                # disables it additionally on validation errors.  We
+                # snapshot the "running" state by checking btnStop:
+                # that button is enabled precisely while a sweep runs.
+                btn_stop = getattr(self, "btnStop", None)
+                running = bool(btn_stop is not None
+                                and btn_stop.isEnabled())
+                btn_start.setEnabled(not running and not issues)
+                if issues and not running:
+                    btn_start.setToolTip(
+                        "Sweep cannot start \u2014 fix the highlighted "
+                        "parameter(s) first.  Hover each red field for "
+                        "the specific error.  (F5)")
+                elif not running:
+                    # Reset to the original shortcut-annotated tooltip.
+                    btn_start.setToolTip("Start sweep  (F5)")
+            except Exception:
+                pass
+
+    @staticmethod
+    def _base_tooltip_for(attr: str) -> str:
+        """Return the default (valid-state) tooltip for a sweep
+        spin-box attribute.  Keeps the validation path from eating the
+        original base-class tooltip after a brief invalid state."""
+        return {
+            "spnVstart": "Start of the voltage sweep.",
+            "spnVstop":  "End of the voltage sweep.",
+            "spnVstep":  "Voltage step between adjacent sweep points.",
+            "spnCompl":  "SMU current compliance (protection limit).",
+            "spnSettle": "Settle time between setting V and reading I.",
+        }.get(attr, "")
+
+    def _install_sweep_spinbox_suffixes(self) -> None:
+        """Attach unit suffixes (V / s / mA) to the inherited sweep
+        spin boxes so the unit stays visible on the value itself.
+        """
+        mapping = (
+            ("spnVstart",  " V"),
+            ("spnVstop",   " V"),
+            ("spnVstep",   " V"),
+            ("spnSettle",  " s"),
+            ("spnCompl",   " mA"),
+            ("spnSatFrac", ""),   # fraction 0..1 — no unit
+        )
+        for attr, suffix in mapping:
+            spn = getattr(self, attr, None)
+            if spn is None:
+                continue
+            try:
+                spn.setSuffix(suffix)
+            except Exception:
+                pass
+
+    def _install_action_shortcuts(self) -> None:
+        """Bind F5 → Start, Esc → Stop shortcuts.
+
+        Uses :meth:`QAbstractButton.setShortcut` so the shortcut fires
+        only while the button is enabled — no need for a custom
+        enable-tracking layer.  Called after ``super().__init__`` so
+        both buttons exist.
+        """
+        from PySide6.QtGui import QKeySequence
+        from PySide6.QtCore import Qt as _Qt
+        btn_start = getattr(self, "btnStart", None)
+        if btn_start is not None:
+            try:
+                btn_start.setShortcut(QKeySequence(_Qt.Key.Key_F5))
+                tip = btn_start.toolTip() or "Start sweep"
+                if "F5" not in tip:
+                    btn_start.setToolTip(tip + "  (F5)")
+            except Exception:
+                pass
+        btn_stop = getattr(self, "btnStop", None)
+        if btn_stop is not None:
+            try:
+                btn_stop.setShortcut(QKeySequence(_Qt.Key.Key_Escape))
+                tip = btn_stop.toolTip() or "Stop sweep"
+                if "Esc" not in tip:
+                    btn_stop.setToolTip(tip + "  (Esc)")
+            except Exception:
+                pass
+
+    # ------------------------------------------------------------------
+    # Main save path — persistent, shared by Single / Double / Triple
+    # ------------------------------------------------------------------
+    def _install_main_save_path(self) -> None:
+        """Initialise the persistent main save path.
+
+        Reads the last-chosen folder via :func:`paths.load_main_save_path`
+        and points the inherited ``_save_folder`` + ``lblFolder`` at it.
+        Also retitles the Output group so the operator sees this is the
+        shared base for all three probe methods.
+        """
+        from pathlib import Path as _P
+        try:
+            from paths import load_main_save_path
+            base = load_main_save_path()
+        except Exception as exc:
+            log.warning("Main save path load failed: %s", exc)
+            base = _P(self._save_folder)
+        self._save_folder = base
+        try:
+            self.lblFolder.setText(str(base))
+            self.lblFolder.setToolTip(
+                "Main save folder — shared by Single, Double and "
+                "Triple measurements.\n"
+                "Each method auto-creates its own subfolder "
+                "(single / double / triple) underneath.\n"
+                "The chosen path is remembered across program "
+                "restarts.")
+        except Exception:
+            pass
+        try:
+            grp = getattr(self, "_grp_file", None)
+            if grp is not None:
+                grp.setTitle("Main save folder (single / double / triple)")
+        except Exception:
+            pass
+
+    def _browse_folder(self):
+        """Override: persist the chosen main save folder so it
+        survives a program restart, and propagate it to an already-
+        open Triple (LP) window.  Per-method subfolders are created
+        by the CSV writers on demand, not here."""
+        from pathlib import Path as _P
+        from PySide6.QtWidgets import QFileDialog
+        d = QFileDialog.getExistingDirectory(
+            self, "Main save folder (single / double / triple)",
+            str(self._save_folder))
+        if not d:
+            return
+        self._save_folder = _P(d)
+        try:
+            self.lblFolder.setText(str(self._save_folder))
+        except Exception:
+            pass
+        try:
+            from paths import store_main_save_path
+            store_main_save_path(self._save_folder)
+            append_log(self,
+                       f"Main save folder set: {self._save_folder}",
+                       "ok")
+        except Exception as exc:
+            append_log(self,
+                       f"Main save folder persist failed: {exc}",
+                       "warn")
+        # Push the new base into any already-open LP (Triple) window
+        # so its auto-save default stays consistent with the main GUI.
+        win = getattr(self, "_lp_window", None)
+        if win is not None:
+            try:
+                win.set_base_save_dir(self._save_folder)
+            except Exception as exc:
+                log.warning("LP window base-save-dir refresh failed: %s", exc)
+        try:
+            self._refresh_status_bar()
         except Exception:
             pass
 
@@ -576,12 +1341,32 @@ class LPMainWindow(DLPMainWindowV2):
         splitter.addWidget(col2)
         self._col2_container = col2
 
-        # Column 3: vertical splitter — K2000 on top, log (with a
-        # small "Log" heading) below.
+        # Column 3: vertical splitter \u2014 K2000 on top, Control
+        # in the middle, Log below.  Moving Control out of the left
+        # column lets the left stack (Instrument + Sweep + Process gas
+        # types + Main save folder) fit comfortably into the viewport
+        # vertical height at Full-HD without scrolling, and keeps
+        # Start/Stop next to the Keithley readout they share a
+        # workflow with.
         third = QSplitter(Qt.Orientation.Vertical)
         third.setObjectName("splitThird")
         third.setChildrenCollapsible(False)
         third.addWidget(grp_k2000)
+
+        # Lift the existing Control group out of the left column.
+        grp_ctrl = getattr(self, "_grp_ctrl", None)
+        if grp_ctrl is not None:
+            try:
+                left_v = getattr(self, "_left_v_layout", None)
+                if left_v is not None:
+                    left_v.removeWidget(grp_ctrl)
+            except Exception:
+                pass
+            try:
+                grp_ctrl.setParent(None)
+                third.addWidget(grp_ctrl)
+            except Exception:
+                log.warning("Control group move failed; leaving in place.")
 
         log_box = QWidget()
         log_v = QVBoxLayout(log_box)
@@ -593,8 +1378,13 @@ class LPMainWindow(DLPMainWindowV2):
         log_v.addWidget(log_widget, 1)
         third.addWidget(log_box)
         self._log_box = log_box
-        third.setStretchFactor(0, 0)
-        third.setStretchFactor(1, 1)
+        # Stretch factors: K2000 + Control are fixed-ish; log absorbs
+        # remaining vertical space but is seeded smaller now so the
+        # overall right column fits a Full-HD viewport without the log
+        # getting cut off at the bottom.
+        for i in range(third.count()):
+            third.setStretchFactor(i, 0)
+        third.setStretchFactor(third.count() - 1, 1)  # log gets the stretch
         splitter.addWidget(third)
         self._splitter_third = third
 
@@ -610,9 +1400,13 @@ class LPMainWindow(DLPMainWindowV2):
         splitter.setStretchFactor(1, 4)
         splitter.setStretchFactor(2, 3)
         splitter.setSizes([280, 800, 540])
-        # Inside the third column, give the log the larger share by
-        # default — K2000 panel is small, log benefits from height.
-        third.setSizes([180, 340])
+        # Inside the third column, seed K2000 + Control + log with
+        # moderate heights that leave the log smaller than before so
+        # every other group fits on a Full-HD vertical viewport.
+        if third.count() == 3:
+            third.setSizes([180, 170, 220])
+        else:
+            third.setSizes([180, 340])
 
     def _build_methods_group(self) -> "QGroupBox":
         """Build the 'Langmuir Probe Methods' selector that sits below
@@ -652,11 +1446,39 @@ class LPMainWindow(DLPMainWindowV2):
             self._on_method_button_toggled)
 
         method_buttons = (
-            (self.btnMethodSingle, "Single Langmuir probe — preset (TBD)."),
-            (self.btnMethodDouble, "Double Langmuir probe — preset (TBD)."),
-            (self.btnMethodTriple, "Triple Langmuir probe — preset (TBD)."),
+            (self.btnMethodSingle,
+             "Single Langmuir probe sweep.\n"
+             "Sweeps one biased tip against a grounded reference; the "
+             "analysis extracts V_f, V_p, T_e and n_e from the electron "
+             "retarding region.\n"
+             "Requires: SMU.\n"
+             "SMU defaults on activation: output-low = GRO, 2-wire "
+             "sense (Remote Sense OFF)."),
+            (self.btnMethodDouble,
+             "Double Langmuir probe sweep (historic default workflow).\n"
+             "Symmetric tanh I-V between two equal tips; the analysis "
+             "yields T_e and ion density from the saturation branches.\n"
+             "Requires: SMU (floating output).\n"
+             "SMU defaults on activation: output-low = FLO, 2-wire "
+             "sense (Remote Sense OFF \u2014 turn ON manually via "
+             "Instrument\u2026 only if 4-wire leads are actually wired)."),
+            (self.btnMethodTriple,
+             "Triple Langmuir probe \u2014 opens the dedicated live LP "
+             "measurement window.\n"
+             "Closed-form T_e / n_e per sample tick from V_d12 (SMU "
+             "bias) and V_d13 (Keithley 2000 DMM); no sweep required.\n"
+             "Requires: SMU (floating) AND Keithley 2000, both "
+             "connected.\n"
+             "SMU defaults on activation: output-low = FLO, 2-wire "
+             "sense (Remote Sense OFF \u2014 turn ON manually only if "
+             "sense leads are wired)."),
             (self.btnMethodCleaning,
-             "Open the timed probe-cleaning dialog (modal)."),
+             "Open the timed probe-cleaning dialog.\n"
+             "Injects a current pulse for a user-defined duration to "
+             "burn contamination off the probe tips.  Not a mode \u2014 "
+             "the dialog is modal and returns to the previous method "
+             "on close.\n"
+             "Requires: SMU connected."),
         )
         # Cleaning + Triple are wired; Single/Double remain visual-only.
         self.btnMethodCleaning.clicked.connect(self._open_cleaning_dialog)
@@ -697,6 +1519,10 @@ class LPMainWindow(DLPMainWindowV2):
             self.btnK2000Read.setEnabled(False)
             self.chkK2000Sim.setEnabled(True)
             append_log(self, "K2000 disconnected.", "info")
+            try:
+                self._refresh_status_bar()
+            except Exception:
+                pass
             return
 
         if self.chkK2000Sim.isChecked():
@@ -737,6 +1563,10 @@ class LPMainWindow(DLPMainWindowV2):
         self.btnK2000Read.setEnabled(True)
         self.chkK2000Sim.setEnabled(False)
         append_log(self, f"K2000 connected ({label}): {idn}", "ok")
+        try:
+            self._refresh_status_bar()
+        except Exception:
+            pass
         # Record the resource that just worked so the discovery
         # window + next app launch keep it as the default.  Only the
         # real-hardware paths update the cache; sim mode does not
@@ -772,21 +1602,87 @@ class LPMainWindow(DLPMainWindowV2):
     K2000_CACHE_KEY = "k2000"
 
     def _build_menu_bar(self) -> None:
-        """Attach a Tools menu with an Interface Discovery action.
+        """Attach the File, Tools and Help menus to the main window.
 
-        Using the window's native menu bar (QMainWindow.menuBar) keeps
-        the entry accessible via keyboard (Alt+T, I) and via the
-        shortcut Ctrl+Shift+I, which is an uncommon-enough chord that
-        it will not collide with existing shortcuts bound by the V2
-        base window.
+        File exposes the main save folder, CSV / parameter I/O and the
+        recent-CSV MRU list.  Tools hosts Interface Discovery and the
+        legacy-data migration.  Help surfaces the shortcut reference,
+        user manual link, and an About box.  Menus are rebuilt
+        idempotently so unit tests that instantiate the window twice
+        do not end up with duplicate entries.
+        """
+        mbar = self.menuBar()
+        for act in list(mbar.actions()):
+            name = act.text().replace("&", "")
+            if name in ("File", "Tools", "Help", "View"):
+                mbar.removeAction(act)
+        self._build_file_menu(mbar)
+        self._build_view_menu(mbar)
+        self._build_tools_menu(mbar)
+        self._build_help_menu(mbar)
+
+    def _build_file_menu(self, mbar) -> None:
+        """Build the File menu: main save folder, CSV I/O + recent,
+        parameter-profile I/O, Exit.  Standard key bindings
+        (Ctrl+O / Ctrl+S / Ctrl+Q) are attached via QAction.
         """
         from PySide6.QtGui import QAction, QKeySequence
-        mbar = self.menuBar()
-        # Remove any stale "Tools" entry a base class might have
-        # built so re-instantiation in tests does not duplicate it.
-        for act in mbar.actions():
-            if act.text().replace("&", "") == "Tools":
-                mbar.removeAction(act)
+        menu = mbar.addMenu("&File")
+
+        act_main = QAction("&Main save folder\u2026", self)
+        act_main.setToolTip(
+            "Choose the base save folder shared by Single, Double "
+            "and Triple measurements.  Each method auto-creates its "
+            "own subfolder (single / double / triple) underneath.  "
+            "The choice is remembered across program restarts.")
+        act_main.triggered.connect(self._browse_folder)
+        menu.addAction(act_main)
+
+        menu.addSeparator()
+
+        act_load_csv = QAction("&Load CSV\u2026", self)
+        act_load_csv.setShortcut(QKeySequence.StandardKey.Open)
+        act_load_csv.setToolTip(
+            "Open a previously saved sweep CSV and populate the "
+            "analysis buffer.  The Method tag in the file header "
+            "is read back so Analyze dispatches correctly.")
+        act_load_csv.triggered.connect(self._open_load_csv_dialog)
+        menu.addAction(act_load_csv)
+
+        self._recent_menu = menu.addMenu("Open &recent CSV")
+        self._recent_menu.setToolTip("Recently loaded CSV files")
+        self._recent_menu.aboutToShow.connect(self._rebuild_recent_csv_menu)
+
+        menu.addSeparator()
+
+        act_save_params = QAction("&Save parameters\u2026", self)
+        act_save_params.setShortcut(QKeySequence.StandardKey.Save)
+        act_save_params.setToolTip(
+            "Save the current instrument / sweep / probe / analysis "
+            "settings to a JSON profile for later reuse.")
+        act_save_params.triggered.connect(self._save_config)
+        menu.addAction(act_save_params)
+
+        act_load_params = QAction("Load &parameters\u2026", self)
+        act_load_params.setShortcut(QKeySequence("Ctrl+Shift+O"))
+        act_load_params.setToolTip(
+            "Restore instrument / sweep / probe / analysis settings "
+            "from a previously saved JSON profile.")
+        act_load_params.triggered.connect(self._load_config)
+        menu.addAction(act_load_params)
+
+        menu.addSeparator()
+
+        act_exit = QAction("E&xit", self)
+        act_exit.setShortcut(QKeySequence.StandardKey.Quit)
+        act_exit.triggered.connect(self.close)
+        menu.addAction(act_exit)
+
+        self._file_menu = menu
+
+    def _build_tools_menu(self, mbar) -> None:
+        """Build the Tools menu: Interface Discovery + Migrate Legacy."""
+        from PySide6.QtGui import QAction, QKeySequence
         tools = mbar.addMenu("&Tools")
         act = QAction("Interface Discovery\u2026", self)
         act.setShortcut(QKeySequence("Ctrl+Shift+I"))
@@ -798,6 +1694,242 @@ class LPMainWindow(DLPMainWindowV2):
         act.triggered.connect(self._open_interface_discovery)
         tools.addAction(act)
         self._actDiscovery = act
+
+        tools.addSeparator()
+
+        act_migrate = QAction("Migrate &legacy data\u2026", self)
+        act_migrate.setToolTip(
+            "One-time migration of historical CSVs from the old "
+            "'double_langmuir' folder into the new 'lp_measurements' "
+            "folder.  Idempotent \u2014 re-running does nothing if "
+            "destinations already exist.  You choose copy (safe) or "
+            "move (consolidate) in the confirmation dialog.")
+        act_migrate.triggered.connect(self._open_migrate_legacy_dialog)
+        tools.addAction(act_migrate)
+        self._actMigrate = act_migrate
+
+    def _build_view_menu(self, mbar) -> None:
+        """Build the View menu: theme selector."""
+        from PySide6.QtGui import QAction, QActionGroup
+        menu = mbar.addMenu("&View")
+
+        theme_menu = menu.addMenu("&Theme")
+        grp = QActionGroup(self)
+        grp.setExclusive(True)
+        self._act_theme_dark = QAction("&Dark", self, checkable=True)
+        self._act_theme_light = QAction("&Light", self, checkable=True)
+        for act, name in ((self._act_theme_dark, "dark"),
+                           (self._act_theme_light, "light")):
+            act.setData(name)
+            grp.addAction(act)
+            theme_menu.addAction(act)
+        grp.triggered.connect(
+            lambda a: self._apply_theme_by_name(a.data()))
+        # Initial check state picked up from the currently-loaded
+        # theme (set by _install_ui_state).
+        current = getattr(self, "_theme_name", "dark")
+        if current == "light":
+            self._act_theme_light.setChecked(True)
+        else:
+            self._act_theme_dark.setChecked(True)
+        self._view_menu = menu
+
+    def _build_help_menu(self, mbar) -> None:
+        """Build the Help menu: Keyboard Shortcuts (F1), User Manual,
+        About.  F1 is mapped to the shortcut reference by convention
+        \u2014 it's the closest "press F1 for help" equivalent the
+        application can offer without a context-sensitive help server.
+        """
+        from PySide6.QtGui import QAction, QKeySequence
+        menu = mbar.addMenu("&Help")
+
+        act_shortcuts = QAction("Keyboard &Shortcuts\u2026", self)
+        act_shortcuts.setShortcut(QKeySequence.StandardKey.HelpContents)  # F1
+        act_shortcuts.setToolTip(
+            "List all keyboard shortcuts available in the main window.")
+        act_shortcuts.triggered.connect(self._show_shortcuts_dialog)
+        menu.addAction(act_shortcuts)
+
+        act_manual = QAction("User &Manual\u2026", self)
+        act_manual.setToolTip(
+            "Open the README / user manual in your default viewer.")
+        act_manual.triggered.connect(self._open_user_manual)
+        menu.addAction(act_manual)
+
+        menu.addSeparator()
+
+        act_about = QAction("&About LP Measurement\u2026", self)
+        act_about.triggered.connect(self._show_about_dialog)
+        menu.addAction(act_about)
+
+        self._help_menu = menu
+
+    # ------------------------------------------------------------------
+    # Help-menu actions
+    # ------------------------------------------------------------------
+    @Slot()
+    def _show_shortcuts_dialog(self) -> None:
+        """Display a read-only dialog listing every shortcut bound in
+        this window.  Sourced from the action/button shortcuts actually
+        installed so the list cannot drift out of sync with the
+        bindings."""
+        from PySide6.QtWidgets import QMessageBox
+        rows = [
+            ("F1",              "Open this shortcuts reference"),
+            ("F5",              "Start sweep"),
+            ("Esc",             "Stop running sweep"),
+            ("Ctrl+O",          "Load CSV\u2026"),
+            ("Ctrl+Shift+O",    "Load parameters\u2026"),
+            ("Ctrl+S",          "Save parameters\u2026"),
+            ("Ctrl+Shift+I",    "Interface Discovery\u2026"),
+            ("Ctrl+Q",          "Exit the application"),
+        ]
+        html = ("<table cellpadding='4' cellspacing='0' "
+                "style='font-family:monospace;'>"
+                "<tr><th align='left'>Shortcut</th>"
+                "<th align='left'>&nbsp;&nbsp;Action</th></tr>")
+        for key, action in rows:
+            html += (f"<tr><td><b>{key}</b></td>"
+                     f"<td>&nbsp;&nbsp;{action}</td></tr>")
+        html += "</table>"
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Information)
+        box.setWindowTitle("Keyboard Shortcuts")
+        box.setTextFormat(Qt.TextFormat.RichText)
+        box.setText(html)
+        box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        box.exec()
+
+    @Slot()
+    def _open_user_manual(self) -> None:
+        """Open the README.md in the OS default viewer.  Falls back to
+        a log hint when the file cannot be located (e.g. trimmed build)."""
+        from pathlib import Path as _P
+        from PySide6.QtCore import QUrl
+        from PySide6.QtGui import QDesktopServices
+        # In dev mode the README lives next to this file; in a frozen
+        # build it's placed next to the exe by the installer.
+        candidates: list[_P] = []
+        try:
+            candidates.append(_P(__file__).resolve().parent / "README.md")
+        except Exception:
+            pass
+        if getattr(sys, "frozen", False):
+            try:
+                candidates.append(
+                    _P(sys.executable).resolve().parent / "README.md")
+            except Exception:
+                pass
+        for p in candidates:
+            if p.exists():
+                QDesktopServices.openUrl(QUrl.fromLocalFile(str(p)))
+                append_log(self, f"User manual opened: {p}", "info")
+                return
+        append_log(self,
+                   "User manual (README.md) not found next to the "
+                   "application.",
+                   "warn")
+
+    @Slot()
+    def _show_about_dialog(self) -> None:
+        """Compact About box: app name, version (best-effort), "
+        "institution."""
+        from PySide6.QtWidgets import QMessageBox
+        version = self._resolve_app_version()
+        html = (
+            "<h3>Langmuir Probe Measurement</h3>"
+            "<p>Single / Double / Triple Langmuir-probe acquisition "
+            "and analysis for the JLU-IPI plasma-diagnostic bench.</p>"
+            f"<p><b>Version:</b> {version}<br>"
+            "<b>Institution:</b> JLU Gie\u00dfen \u2014 Institut f\u00fcr "
+            "Plasmaphysik (IPI)</p>"
+            "<p>Hardware: Keysight B2901 SMU + Keithley 2000 DMM "
+            "(optional for Triple).</p>")
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Information)
+        box.setWindowTitle("About LP Measurement")
+        box.setTextFormat(Qt.TextFormat.RichText)
+        box.setText(html)
+        box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        box.exec()
+
+    def _resolve_app_version(self) -> str:
+        """Best-effort version lookup: git describe in dev, static
+        fallback in frozen.  Never raises.  Shown verbatim in About."""
+        if not getattr(sys, "frozen", False):
+            try:
+                import subprocess
+                from pathlib import Path as _P
+                out = subprocess.run(
+                    ["git", "-C", str(_P(__file__).resolve().parent),
+                     "describe", "--tags", "--always", "--dirty"],
+                    capture_output=True, text=True, timeout=2.0)
+                if out.returncode == 0 and out.stdout.strip():
+                    return out.stdout.strip()
+            except Exception:
+                pass
+        return "stable-v3"
+
+    # ------------------------------------------------------------------
+    # Recent-CSV MRU submenu — populated lazily on every open so the
+    # list stays in sync with disk state (e.g. if another process
+    # cleared the store) without having to hook file-system events.
+    # ------------------------------------------------------------------
+    @Slot()
+    def _rebuild_recent_csv_menu(self) -> None:
+        """Refresh the Open-recent-CSV submenu from the persisted MRU."""
+        menu = getattr(self, "_recent_menu", None)
+        if menu is None:
+            return
+        menu.clear()
+        try:
+            from paths import load_recent_csv_files
+            files = load_recent_csv_files()
+        except Exception:
+            files = []
+        if not files:
+            act = menu.addAction("(no recent files)")
+            act.setEnabled(False)
+            return
+        for raw in files:
+            display = self._shorten_path_for_menu(raw)
+            # "&&" escapes an ampersand so a path like "A&B" is not
+            # misread as a mnemonic.  Unlikely on Windows but safe.
+            act = menu.addAction(display.replace("&", "&&"))
+            act.setToolTip(raw)
+            act.triggered.connect(
+                lambda checked=False, p=raw: self._load_recent_csv_entry(p))
+        menu.addSeparator()
+        clear_act = menu.addAction("&Clear recent list")
+        clear_act.triggered.connect(self._clear_recent_csv_menu)
+
+    def _load_recent_csv_entry(self, path: str) -> None:
+        from pathlib import Path as _P
+        if not _P(path).exists():
+            append_log(self,
+                       f"Recent CSV not found: {path} (skipping).",
+                       "warn")
+            return
+        try:
+            self._load_csv_with_method_tag(path)
+        except Exception as exc:
+            append_log(self, f"CSV load failed: {exc}", "error")
+
+    def _clear_recent_csv_menu(self) -> None:
+        try:
+            from paths import clear_recent_csv_files
+            clear_recent_csv_files()
+            append_log(self, "Recent CSV list cleared.", "info")
+        except Exception as exc:
+            append_log(self, f"Clear recent failed: {exc}", "warn")
+
+    @staticmethod
+    def _shorten_path_for_menu(p: str, max_len: int = 60) -> str:
+        """Trim a path for menu display, keeping the tail readable."""
+        s = str(p)
+        if len(s) <= max_len:
+            return s
+        return "\u2026" + s[-(max_len - 1):]
 
     @Slot()
     def _open_interface_discovery(self) -> None:
@@ -1054,7 +2186,8 @@ class LPMainWindow(DLPMainWindowV2):
                         gas_mix_label=gas_label,
                         mi_kg=mi_kg,
                         area_m2=area_m2,
-                        ion_composition_context=ion_ctx)
+                        ion_composition_context=ion_ctx,
+                        base_save_dir=self._save_folder)
         # Re-connect the running_changed signal (safe to disconnect first
         # in case the singleton was raised, not freshly created).
         try:
@@ -1069,21 +2202,22 @@ class LPMainWindow(DLPMainWindowV2):
     #: Default SMU configuration per method mode.
     #
     # * Single — a single probe collects current against a grounded
-    #   reference; GRO is the natural output-low mode and 2-wire is
-    #   sufficient because the sense-lead wiring is rarely present
-    #   for this geometry.
+    #   reference; GRO is the natural output-low mode.
     # * Double — the historic primary workflow: floating I-V sweep
-    #   between two equally-sized tips; 4-wire keeps the sweep V
-    #   accurate against probe-lead resistance.
+    #   between two equally-sized tips.
     # * Triple — physically *requires* a floating SMU (the model
-    #   breaks otherwise); 4-wire / Remote Sense gives a clean V_d12
-    #   readback at the sondle wiring interface.  If the bench has
-    #   no sense leads the user must manually flip Remote Sense off
-    #   in Instrument Options — the dialog warns about that case.
+    #   breaks otherwise).
+    #
+    # Remote Sense (4-wire) is OFF by default for every method: the
+    # bench is wired 2-wire.  Activating 4-wire without sense leads
+    # connected causes the B2901 to drive the output to its voltage
+    # rail trying to regulate a non-existent remote measurement — a
+    # damage-risk to the probe wiring.  Operators who *do* have sense
+    # leads can opt in via Instrument Options\u2026.
     METHOD_MODE_DEFAULTS: dict = {
         "single": {"output_low": "GRO", "remote_sense": False},
-        "double": {"output_low": "FLO", "remote_sense": True},
-        "triple": {"output_low": "FLO", "remote_sense": True},
+        "double": {"output_low": "FLO", "remote_sense": False},
+        "triple": {"output_low": "FLO", "remote_sense": False},
     }
 
     #: Per-method simulation IV model.  Single uses the asymmetric
@@ -1114,6 +2248,60 @@ class LPMainWindow(DLPMainWindowV2):
             return
         self._apply_method_mode(mode)
 
+    #: Per-method Analyze button label + tooltip.  Surfaces the active
+    #: analysis pipeline in the button itself so the operator does not
+    #: have to remember which method the sweep buffer was acquired in.
+    ANALYZE_BUTTON_INFO: dict = {
+        "single": (
+            "Analyze (Single)",
+            "Run the single-probe analysis on the current sweep buffer.\n"
+            "Extracts V_f, V_p, T_e and n_e from the electron retarding "
+            "region.  Options: Fit Model\u2026 opens the Single-probe "
+            "settings dialog."),
+        "double": (
+            "Analyze (Double)",
+            "Run the double-probe analysis on the current sweep buffer.\n"
+            "Symmetric tanh fit on the saturation branches; T_e and ion "
+            "density from the fit parameters.  Options: Fit Model\u2026 "
+            "opens the Double-probe + fit-model dialog."),
+        "triple": (
+            "Analyze (Triple — in LP window)",
+            "Triple-probe analysis runs live inside the dedicated LP "
+            "measurement window (Methods \u2192 Triple).\n"
+            "Clicking this button in Triple mode only logs an info hint "
+            "\u2014 there is no swept fit to run here."),
+    }
+
+    def _refresh_analyze_button_for_method(self, mode: str) -> None:
+        """Update the Analyze button label + tooltip + enabled state
+        to match ``mode``.
+
+        In Triple mode the button is disabled: Triple analysis runs
+        live inside the dedicated LP measurement window, so clicking
+        the main Analyze would only log a hint.  Disabling it is the
+        clearest UX signal that this path is intentionally parked.
+
+        Best-effort: if ``btnAnalyze`` has not been built yet (during
+        base-class construction) or is unavailable in a test harness,
+        the call silently no-ops.
+        """
+        btn = getattr(self, "btnAnalyze", None)
+        if btn is None:
+            return
+        label, tip = self.ANALYZE_BUTTON_INFO.get(
+            mode, ("Analyze", "Run analysis on the current sweep buffer."))
+        try:
+            btn.setText(label)
+            btn.setToolTip(tip)
+            btn.setEnabled(mode != "triple")
+        except Exception:
+            pass
+        # Keep the status-bar method slot in lockstep with the button.
+        try:
+            self._refresh_status_bar()
+        except Exception:
+            pass
+
     def _apply_method_mode(self, mode: str) -> None:
         """Set the SMU-relevant defaults for the chosen method mode.
 
@@ -1128,6 +2316,17 @@ class LPMainWindow(DLPMainWindowV2):
         switches the live FakeB2901v2 instance to that model so the
         next Read produces the correct IV curve without a reconnect.
         """
+        # Analyze button follows the active method regardless of the
+        # instrument-options state so the label stays honest even in
+        # incomplete test harnesses.
+        self._refresh_analyze_button_for_method(mode)
+        # A method change invalidates any legend from the previous
+        # analysis \u2014 those labels describe a different physics
+        # pipeline (Single's V_f/V_p vs. Double's tanh fit etc.).
+        try:
+            self._clear_plot_legend()
+        except Exception:
+            pass
         defaults = self.METHOD_MODE_DEFAULTS.get(mode)
         sim_model = self.METHOD_MODE_SIM_MODELS.get(mode)
         if defaults is None or sim_model is None:
@@ -1175,6 +2374,65 @@ class LPMainWindow(DLPMainWindowV2):
     # ------------------------------------------------------------------
     # SMU connect — inject the per-method sim model
     # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Hard safety interlock on sweep start — last line of defence before
+    # output is enabled.  Even if a future code path bypasses the
+    # live-validation gate (scripted Start, stale UI state), this check
+    # prevents a damaging V \u00d7 I combination.
+    # ------------------------------------------------------------------
+    def _start_sweep(self):
+        try:
+            v_abs_max = max(abs(self.spnVstart.value()),
+                            abs(self.spnVstop.value()))
+            i_compl_a = self.spnCompl.value() / 1000.0
+        except Exception:
+            v_abs_max, i_compl_a = 0.0, 0.0
+        _, ok, reason = self._check_power_safety(v_abs_max, i_compl_a)
+        if not ok:
+            append_log(self,
+                       f"Sweep REFUSED (safety): {reason}  "
+                       f"Reduce V-range or compliance and retry.",
+                       "error")
+            # Keep Start disabled so the UI stays consistent.
+            try:
+                self.btnStart.setEnabled(False)
+            except Exception:
+                pass
+            return
+        super()._start_sweep()
+
+    def _scan_resources(self):
+        """Override: surface VISA-scan progress via disabled button,
+        temporary label text, and a wait cursor.  V1's scan runs
+        synchronously on the GUI thread (short on this bench), so a
+        heavyweight background worker is overkill \u2014 the visual
+        feedback is what the operator actually needs.
+        """
+        from PySide6.QtCore import Qt as _Qt
+        from PySide6.QtGui import QCursor
+        from PySide6.QtWidgets import QApplication
+        btn = getattr(self, "btnScan", None)
+        prev_text = None
+        if btn is not None:
+            try:
+                prev_text = btn.text()
+                btn.setEnabled(False)
+                btn.setText("Scan\u2026")
+            except Exception:
+                btn = None
+        QApplication.setOverrideCursor(QCursor(_Qt.CursorShape.WaitCursor))
+        try:
+            QApplication.processEvents()  # flush the disabled-state paint
+            super()._scan_resources()
+        finally:
+            QApplication.restoreOverrideCursor()
+            if btn is not None:
+                try:
+                    btn.setEnabled(True)
+                    btn.setText(prev_text or "Scan")
+                except Exception:
+                    pass
+
     def _toggle_connect(self):
         """Override: ensure the sim path picks up the method-specific
         IV model.  V2's sim-connect branch reads ``self._sim_options``
@@ -1188,6 +2446,10 @@ class LPMainWindow(DLPMainWindowV2):
             if isinstance(sim_opts, dict):
                 sim_opts["model"] = self._current_sim_model()
         super()._toggle_connect()
+        try:
+            self._refresh_status_bar()
+        except Exception:
+            pass
 
     def _current_sim_model(self) -> str:
         """Return the sim IV model implied by the active method button.
@@ -1314,6 +2576,7 @@ class LPMainWindow(DLPMainWindowV2):
             parent=self,
             sim_current_a=sim_current,
             prev_output_low=prev_low,
+            max_power_w=self.SMU_MAX_POWER_W,
         )
         dlg.exec()
 
@@ -1876,6 +3139,15 @@ class LPMainWindow(DLPMainWindowV2):
         sweep slots all funnel through ``_set_sweep_ui``."""
         super()._set_sweep_ui(running)
         self._lock_method_buttons_during_sweep(running)
+        # Re-run parameter validation after a sweep finishes so that
+        # a lingering invalid state (e.g. V_step > range) re-disables
+        # Start even though the base class just unconditionally
+        # re-enabled it.
+        if not running:
+            try:
+                self._validate_sweep_params()
+            except Exception:
+                pass
 
     def _lock_method_buttons_during_sweep(self, running: bool) -> None:
         """While a sweep is running, refuse Single/Double/Triple
@@ -1910,6 +3182,60 @@ class LPMainWindow(DLPMainWindowV2):
             except Exception:
                 pass
         self._single_overlay_lines.clear()
+        try:
+            self.canvas.draw_idle()
+        except Exception:
+            pass
+
+    def _clear_plot_legend(self) -> None:
+        """Drop the plot legend and any stale analysis-overlay data.
+
+        Triggered on:
+          * every Start click (Single / Double), so the previous
+            analysis' legend does not sit on top of a fresh sweep;
+          * every method-mode change, because last run's legend
+            entries describe a different physics pipeline and would
+            only confuse the operator.
+
+        Also blanks the Double-analysis overlay lines (fit-positive,
+        fit-negative, corrected curve, model fit) and the Single V_f /
+        V_p axvlines so a subsequent ``ax.legend()`` call from a new
+        Analyze cannot resurface last run's labels.  Redraws the
+        canvas once at the end.
+        """
+        ax = getattr(self, "ax", None)
+        if ax is None:
+            return
+        try:
+            leg = ax.get_legend()
+            if leg is not None:
+                leg.remove()
+        except Exception:
+            pass
+        for attr in ("line_fit_pos", "line_fit_neg",
+                     "line_corrected", "line_te_fit"):
+            ln = getattr(self, attr, None)
+            if ln is None:
+                continue
+            try:
+                ln.set_data([], [])
+            except Exception:
+                pass
+        # Shading patches from Double's fit-region highlight are
+        # tracked in _fit_shading; clear those too so the next legend
+        # is not polluted by the previous sweep's fit-region hints.
+        patches = getattr(self, "_fit_shading", None)
+        if isinstance(patches, list):
+            for p in patches:
+                try:
+                    p.remove()
+                except Exception:
+                    pass
+            patches.clear()
+        try:
+            self._clear_single_overlays()
+        except Exception:
+            pass
         try:
             self.canvas.draw_idle()
         except Exception:
@@ -2003,6 +3329,14 @@ class LPMainWindow(DLPMainWindowV2):
                        f"CSV loaded: {len(self._v_ist)} pts, "
                        "no Method tag — Analyze will ask for "
                        "confirmation.", "warn")
+        # Feed the MRU list so the File \u2192 Open recent CSV submenu
+        # surfaces this file on the next open.  Best-effort: a failed
+        # persist never blocks the load.
+        try:
+            from paths import add_recent_csv_file
+            add_recent_csv_file(path)
+        except Exception:
+            pass
         return meta
 
     # ------------------------------------------------------------------
@@ -2288,6 +3622,20 @@ class LPMainWindow(DLPMainWindowV2):
     # Cleanup
     # ------------------------------------------------------------------
     def closeEvent(self, event):
+        # Persist the operator's theme + geometry + splitter positions
+        # before tearing down so the next launch feels like the same
+        # session.  Best-effort: a persist failure never blocks close.
+        # Skipped under headless-test mode to keep repo state clean
+        # across CI runs.
+        import os as _os
+        if _os.environ.get("QT_QPA_PLATFORM") != "offscreen":
+            try:
+                from paths import load_ui_state, store_ui_state
+                state = load_ui_state()
+                state.update(self._collect_ui_state())
+                store_ui_state(state)
+            except Exception:
+                pass
         try:
             if self.k2000 is not None:
                 self.k2000.close()

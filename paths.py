@@ -165,3 +165,155 @@ def visa_cache_path() -> Path:
     if is_frozen():
         return user_data_dir() / "visa_cache.json"
     return _repo_root() / "visa_cache.json"
+
+
+#: JSON file persisting the user-chosen main save folder that the
+#: main GUI picks via its "Main save folder" button.  Single, Double
+#: and Triple all branch off this base via their per-method subfolders.
+_MAIN_SAVE_PATH_FILENAME = "lp_main_save_path.json"
+
+
+def main_save_path_config_file() -> Path:
+    """Location of the JSON file that persists the operator's
+    main-save-folder choice.  Always inside :func:`user_data_dir`
+    so both dev- and frozen-builds find the same file."""
+    return user_data_dir() / _MAIN_SAVE_PATH_FILENAME
+
+
+def load_main_save_path() -> Path:
+    """Return the main save folder chosen by the operator, or the
+    :func:`lp_measurements_data_dir` default if none is stored yet.
+
+    The returned folder is created on disk if missing.  Any read or
+    parse error silently falls back to the default so a corrupt
+    config never prevents the application from starting.
+    """
+    cfg = main_save_path_config_file()
+    if cfg.exists():
+        try:
+            import json
+            data = json.loads(cfg.read_text(encoding="utf-8"))
+            raw = data.get("main_save_path") if isinstance(data, dict) else None
+            if raw:
+                p = Path(str(raw))
+                p.mkdir(parents=True, exist_ok=True)
+                return p
+        except Exception:
+            pass
+    return lp_measurements_data_dir()
+
+
+def store_main_save_path(path) -> Path:
+    """Persist the operator's main-save-folder choice to disk.
+
+    The folder itself is also created if missing so subsequent saves
+    by Single/Double/Triple find their per-method subfolders ready.
+    Returns the resolved :class:`Path` for caller convenience.
+    """
+    import json
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    cfg = main_save_path_config_file()
+    cfg.parent.mkdir(parents=True, exist_ok=True)
+    cfg.write_text(
+        json.dumps({"main_save_path": str(p)}, indent=2),
+        encoding="utf-8")
+    return p
+
+
+#: JSON file with the most-recently-loaded CSV files (MRU list).
+#: Shown as the File → Open recent CSV submenu entries.
+_RECENT_FILES_FILENAME = "recent_csv_files.json"
+_RECENT_FILES_MAX = 10
+
+
+def recent_files_path() -> Path:
+    """Location of the JSON file listing recently-loaded CSVs."""
+    return user_data_dir() / _RECENT_FILES_FILENAME
+
+
+def load_recent_csv_files() -> list[str]:
+    """Return up to :data:`_RECENT_FILES_MAX` recently-loaded CSV paths,
+    newest first.  An unreadable or missing file yields an empty list."""
+    cfg = recent_files_path()
+    if not cfg.exists():
+        return []
+    try:
+        import json
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        items = data.get("files") if isinstance(data, dict) else None
+        if isinstance(items, list):
+            return [str(p) for p in items][:_RECENT_FILES_MAX]
+    except Exception:
+        pass
+    return []
+
+
+def add_recent_csv_file(path) -> list[str]:
+    """Prepend ``path`` to the recent list (deduplicating) and persist.
+
+    Returns the updated list for caller convenience.  Write errors
+    are swallowed \u2014 the MRU list is a convenience, never critical.
+    """
+    import json
+    p = str(path)
+    items = [e for e in load_recent_csv_files() if e != p]
+    items.insert(0, p)
+    items = items[:_RECENT_FILES_MAX]
+    cfg = recent_files_path()
+    try:
+        cfg.parent.mkdir(parents=True, exist_ok=True)
+        cfg.write_text(
+            json.dumps({"files": items}, indent=2),
+            encoding="utf-8")
+    except Exception:
+        pass
+    return items
+
+
+def clear_recent_csv_files() -> None:
+    """Delete the recent-files store.  No-op if it doesn't exist."""
+    cfg = recent_files_path()
+    try:
+        if cfg.exists():
+            cfg.unlink()
+    except Exception:
+        pass
+
+
+#: JSON file with persisted UI state (theme, window geometry, splitter
+#: positions).  Written on window-close, read on window-construct.
+_UI_STATE_FILENAME = "ui_state.json"
+
+
+def ui_state_path() -> Path:
+    """Location of the JSON file that stores persistent UI preferences."""
+    return user_data_dir() / _UI_STATE_FILENAME
+
+
+def load_ui_state() -> dict:
+    """Return the persisted UI-state dict, or an empty dict if none
+    exists yet / the file is unreadable."""
+    cfg = ui_state_path()
+    if not cfg.exists():
+        return {}
+    try:
+        import json
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def store_ui_state(state: dict) -> None:
+    """Persist the UI-state dict.  Failures are swallowed \u2014 UI
+    preferences are a convenience, never critical."""
+    import json
+    cfg = ui_state_path()
+    try:
+        cfg.parent.mkdir(parents=True, exist_ok=True)
+        cfg.write_text(
+            json.dumps(state, indent=2, sort_keys=True),
+            encoding="utf-8")
+    except Exception:
+        pass

@@ -48,7 +48,8 @@ class LPMeasurementWindow(QWidget):
                  gas_mix_label: Optional[str] = None,
                  mi_kg: Optional[float] = None,
                  area_m2: Optional[float] = None,
-                 ion_composition_context: Optional[dict] = None):
+                 ion_composition_context: Optional[dict] = None,
+                 base_save_dir: Optional[Path] = None):
         super().__init__(parent)
         self.setWindowTitle("Langmuir Probe Measurement")
         self.setWindowFlag(Qt.WindowType.Window, True)
@@ -87,6 +88,13 @@ class LPMeasurementWindow(QWidget):
         # current value.
         self._area_m2 = float(area_m2) if area_m2 is not None \
             else float(DEFAULT_AREA_M2)
+        # Base save folder shared with the main GUI.  ``None`` means
+        # "fall back to paths.lp_measurements_data_dir()" — see
+        # :meth:`_default_autosave_path`.  The main window passes its
+        # persisted main-save-path here so Triple, Single and Double
+        # all land under the same operator-chosen root.
+        self._base_save_dir: Optional[Path] = (
+            Path(base_save_dir) if base_save_dir is not None else None)
         self._dataset = TripleDataset()
         self._worker: Optional[TripleProbeWorker] = None
         self._te_t: list[float] = []
@@ -143,28 +151,50 @@ class LPMeasurementWindow(QWidget):
         self.spnCompliance.setValue(0.01); self.spnCompliance.setSuffix(" A")
         fl.addRow("Compliance:", self.spnCompliance)
 
-        # Probe area — read-only display.  The single source of truth
-        # is the main window's Probe Params… dialog; the LP window
-        # only mirrors the value here.
+        # Probe area — read-only display plus an Edit\u2026 shortcut
+        # to the main window's Probe Params dialog so the operator
+        # doesn't have to leave the Triple window to change it.
         self.lblArea = QLabel(self._format_area_label(self._area_m2))
         self.lblArea.setToolTip(
-            "Probe area derived from Probe Params… in the main window. "
-            "Edit it there — this field is read-only here.")
+            "Probe area derived from Probe Params\u2026 in the main "
+            "window.  This field is read-only here \u2014 use the "
+            "Edit\u2026 button on the right to change it.")
         self.lblArea.setStyleSheet(
             "color: #c0c8d8; font-style: italic;")
-        fl.addRow("Probe area:", self.lblArea)
+        self.btnEditProbe = QPushButton("Edit\u2026")
+        self.btnEditProbe.setMaximumWidth(54)
+        self.btnEditProbe.setToolTip(
+            "Open the main window's Probe Params\u2026 dialog to edit "
+            "probe geometry and area.")
+        self.btnEditProbe.clicked.connect(self._open_probe_params_on_parent)
+        area_row = QHBoxLayout()
+        area_row.setContentsMargins(0, 0, 0, 0); area_row.setSpacing(6)
+        area_row.addWidget(self.lblArea, 1)
+        area_row.addWidget(self.btnEditProbe)
+        fl.addRow("Probe area:", area_row)
 
-        # Gas mix is now read from the parent's Experiment dialog
-        # (Process gas types) so a real mixture is honoured by the
-        # Triple analysis.  The label is read-only — change the mix
-        # via the main window's Experiment… button.
+        # Gas mix is read from the parent's Experiment dialog (Process
+        # gas types) so a real mixture is honoured.  Edit\u2026 opens
+        # that same dialog directly.
         self.lblGasMix = QLabel(self._gas_mix_label or "Argon (Ar)")
         self.lblGasMix.setToolTip(
-            "Gas mix used by the Triple-Probe analysis.\n"
-            "Edit via the main window's Experiment\u2026 button.")
+            "Gas mix used by the Triple-Probe analysis.  Read-only "
+            "here \u2014 use Edit\u2026 to open the main window's "
+            "Experiment dialog.")
         self.lblGasMix.setStyleSheet(
             "color: #c0c8d8; font-style: italic;")
-        fl.addRow("Gas mix:", self.lblGasMix)
+        self.btnEditExperiment = QPushButton("Edit\u2026")
+        self.btnEditExperiment.setMaximumWidth(54)
+        self.btnEditExperiment.setToolTip(
+            "Open the main window's Experiment\u2026 dialog to edit "
+            "process gas species, flows, and ion-composition settings.")
+        self.btnEditExperiment.clicked.connect(
+            self._open_experiment_on_parent)
+        gas_row = QHBoxLayout()
+        gas_row.setContentsMargins(0, 0, 0, 0); gas_row.setSpacing(6)
+        gas_row.addWidget(self.lblGasMix, 1)
+        gas_row.addWidget(self.btnEditExperiment)
+        fl.addRow("Gas mix:", gas_row)
 
         self.cmbSign = QComboBox()
         self.cmbSign.addItem("+1  (V_d13 = +U_K2000)", +1)
@@ -173,16 +203,20 @@ class LPMeasurementWindow(QWidget):
 
         # Formula choice — user-friendly labels for what used to be
         # "Use exact Eq-10 (fallback Eq-11)".  Default is the fast
-        # closed-form approximation; Exact triggers the bisection
-        # solver with the closed form as a fallback.
+        # closed-form approximation; Numeric triggers the bisection
+        # solver with the closed form as a fallback.  "Numeric" is
+        # the operator-facing wording since the solver is numerical
+        # and not in any absolute sense more "exact" than the
+        # analytical closed form.
         self.cmbEqMode = QComboBox()
         self.cmbEqMode.addItem("Approx.", False)   # prefer_eq10 = False
-        self.cmbEqMode.addItem("Exact", True)      # prefer_eq10 = True
+        self.cmbEqMode.addItem("Numeric", True)    # prefer_eq10 = True
         self.cmbEqMode.setCurrentIndex(0)          # default: Approx.
         self.cmbEqMode.setToolTip(
             "Te formula:\n"
-            "  Approx. — closed-form Te = V_d13 / ln 2 (fast, robust).\n"
-            "  Exact   — implicit triple-probe equation, solved "
+            "  Approx. \u2014 closed-form Te = V_d13 / ln 2 "
+            "(fast, robust).\n"
+            "  Numeric \u2014 implicit triple-probe equation, solved "
             "numerically (falls back to Approx. on failure).")
         fl.addRow("Formula:", self.cmbEqMode)
 
@@ -341,12 +375,82 @@ class LPMeasurementWindow(QWidget):
     # Helpers
     # ------------------------------------------------------------------
     def _default_autosave_path(self) -> Path:
+        base = self._base_save_dir
+        if base is None:
+            try:
+                from paths import lp_measurements_data_dir
+                base = lp_measurements_data_dir()
+            except Exception:
+                base = Path.cwd()
+        return make_triple_csv_path(Path(base))
+
+    def set_base_save_dir(self, base: Optional[Path]) -> None:
+        """Update the shared main save folder and refresh the
+        auto-save path.  Called by the main GUI after the operator
+        picks a new main save folder so this (singleton) window
+        stays in sync even after a live change."""
+        self._base_save_dir = Path(base) if base is not None else None
         try:
-            from paths import lp_measurements_data_dir
-            base = lp_measurements_data_dir()
+            self.editAutoSavePath.setText(
+                str(self._default_autosave_path()))
         except Exception:
-            base = Path.cwd()
-        return make_triple_csv_path(base)
+            pass
+
+    # ------------------------------------------------------------------
+    # Edit-in-parent helpers (Probe area, Gas mix)
+    # ------------------------------------------------------------------
+    @Slot()
+    def _open_probe_params_on_parent(self) -> None:
+        """Open the main window's Probe Params dialog without closing
+        this Triple window.  Forwards to the parent's existing slot
+        and re-reads the probe area afterwards so the read-only label
+        reflects any change the operator just made."""
+        parent = self.parent()
+        if parent is None or not hasattr(parent, "_open_probe_dialog"):
+            self._log("Probe Params dialog unavailable \u2014 parent "
+                      "window not wired for it.", "warn")
+            return
+        try:
+            parent._open_probe_dialog()
+        except Exception as exc:
+            self._log(f"Probe Params open failed: {exc}", "error")
+            return
+        # Re-pull the area from the parent so the read-only label
+        # matches the freshly-chosen geometry.
+        try:
+            new_area = None
+            if hasattr(parent, "_build_lp_probe_area_m2"):
+                new_area = parent._build_lp_probe_area_m2()
+            if new_area is not None:
+                self._area_m2 = float(new_area)
+                self.lblArea.setText(self._format_area_label(new_area))
+        except Exception:
+            pass
+
+    @Slot()
+    def _open_experiment_on_parent(self) -> None:
+        """Open the main window's Experiment dialog (process gases,
+        ion composition).  Refreshes the gas-mix label afterwards."""
+        parent = self.parent()
+        if parent is None or not hasattr(parent, "_open_experiment_dialog"):
+            self._log("Experiment dialog unavailable \u2014 parent "
+                      "window not wired for it.", "warn")
+            return
+        try:
+            parent._open_experiment_dialog()
+        except Exception as exc:
+            self._log(f"Experiment open failed: {exc}", "error")
+            return
+        try:
+            if hasattr(parent, "_build_lp_gas_context"):
+                gas_label, mi_kg, _ = parent._build_lp_gas_context()
+                if gas_label is not None:
+                    self._gas_mix_label = gas_label
+                    self.lblGasMix.setText(gas_label)
+                if mi_kg is not None:
+                    self._mi_kg_override = mi_kg
+        except Exception:
+            pass
 
     def _log(self, msg: str, level: str = "info") -> None:
         try:
@@ -752,6 +856,7 @@ def show_or_raise(parent, smu, k2000, *,
                   mi_kg: Optional[float] = None,
                   area_m2: Optional[float] = None,
                   ion_composition_context: Optional[dict] = None,
+                  base_save_dir: Optional[Path] = None,
                   ) -> LPMeasurementWindow:
     """Singleton accessor on the parent window.
 
@@ -759,7 +864,9 @@ def show_or_raise(parent, smu, k2000, *,
     simulation-mode probe-current override.  ``gas_mix_label`` and
     ``mi_kg`` are computed by the LP main window from the Experiment
     dialog (Process gas types) so a real gas mixture is honoured by
-    the Triple analysis.
+    the Triple analysis.  ``base_save_dir`` is the operator-chosen
+    main save folder from the main GUI so Triple's auto-save default
+    lands under the same root as Single / Double.
     """
     win = getattr(parent, "_lp_window", None)
     if win is None:
@@ -768,7 +875,8 @@ def show_or_raise(parent, smu, k2000, *,
             sim_current_a=sim_current_a,
             gas_mix_label=gas_mix_label, mi_kg=mi_kg,
             area_m2=area_m2,
-            ion_composition_context=ion_composition_context)
+            ion_composition_context=ion_composition_context,
+            base_save_dir=base_save_dir)
         parent._lp_window = win
         parent._triple_window = win
     else:
@@ -795,6 +903,13 @@ def show_or_raise(parent, smu, k2000, *,
             # CSV header to reflect the *current* experiment state.
             win._ion_composition_context = dict(
                 ion_composition_context)
+        if base_save_dir is not None:
+            # Keep the auto-save default in lockstep with the main
+            # GUI's main save folder on every re-open.
+            try:
+                win.set_base_save_dir(base_save_dir)
+            except Exception:
+                pass
     win.show()
     win.raise_()
     win.activateWindow()

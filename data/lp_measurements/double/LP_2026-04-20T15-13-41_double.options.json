@@ -1,0 +1,59 @@
+{
+  "schema": "lp-analysis-options",
+  "schema_version": 1,
+  "csv_file": "LP_2026-04-20T15-13-41_double.csv",
+  "method": "double",
+  "options": {
+    "compliance_mode": "exclude_clipped",
+    "hysteresis_threshold_pct": 5.0,
+    "bootstrap_enabled": false,
+    "bootstrap_n_iters": 200,
+    "show_analysis_log": false,
+    "probe_area_rel_unc_pct": 0.0,
+    "ion_mass_rel_unc_pct": 0.0
+  },
+  "written_at": "2026-04-20T15:14:21",
+  "fit_model": "tanh_slope",
+  "analysis": {
+    "fit_status": "ok",
+    "Te_eV": 2.999999992541025,
+    "Te_err_eV": 4.332822312962369e-09,
+    "Te_ci95_lo_eV": 2.999999984048693,
+    "Te_ci95_hi_eV": 3.0000000010333565,
+    "Te_ci_method": "covariance",
+    "R2": 1.0,
+    "NRMSE": 2.3315768563500027e-09,
+    "grade": "excellent",
+    "I_sat_A": 0.0019999999870121497,
+    "I_sat_ci95_lo_A": 0.0019999999846739653,
+    "I_sat_ci95_hi_A": 0.001999999989350334,
+    "I_sat_ci_method": "covariance",
+    "fit_warning_reason": null,
+    "n_i_m3": 1.4761171571699894e+18,
+    "n_i_ci95_lo_m3": 1.4761171544601577e+18,
+    "n_i_ci95_hi_m3": 1.476117159879821e+18,
+    "n_i_ci_method": "covariance",
+    "n_i_ci_note": "fit_only",
+    "ion_composition_mode": "molecular",
+    "n_i_ci_ion_mix_rel_unc": 0.0,
+    "x_atomic": 0.0,
+    "x_atomic_unc": 0.0,
+    "ion_composition_preset": "custom",
+    "compliance_info": {
+      "source": "operator_provided",
+      "n_total": 201,
+      "n_flagged": 0,
+      "clipped_fraction": 0.0,
+      "action": "n/a"
+    },
+    "extra": {
+      "compliance_info": {
+        "source": "operator_provided",
+        "n_total": 201,
+        "n_flagged": 0,
+        "clipped_fraction": 0.0,
+        "action": "n/a"
+      }
+    }
+  }
+}

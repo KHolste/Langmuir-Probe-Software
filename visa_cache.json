@@ -24,9 +24,13 @@
         {
           "resource": "GPIB0::9::INSTR",
           "idn": ""
+        },
+        {
+          "resource": "COM11",
+          "idn": ""
         }
       ],
-      "last_successful": "GPIB0::9::INSTR",
+      "last_successful": "COM11",
       "scanned_at": ""
     }
   }
