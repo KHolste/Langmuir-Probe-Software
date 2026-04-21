@@ -46,216 +46,11 @@ log = logging.getLogger(__name__)
 DEFAULT_K2000_VISA = Keithley2000DMM.DEFAULT_VISA  # "GPIB0::9::INSTR"
 
 
-def _format_compact_double(fit_dict, plasma_dict, comparison_list,
-                             *, compliance_info: dict | None = None) -> str:
-    """Compact one-block summary of the Double-probe analysis.
-
-    Replaces V2's ~25-line verbose block + 8-line model comparison
-    with a single ~6-line table plus a one-line-per-model footer
-    (only emitted if more than one model was actually compared).
-    Preserves T_e, I_sat, model name, fit grade, and n_i/Bohm —
-    the wider parameter-detail dump is intentionally dropped.
-
-    When ``fit_dict`` carries a non-``OK`` ``fit_status`` (see
-    :class:`dlp_fit_models.FitStatus`) the block is topped with a
-    prominent "Status" row so the operator cannot confuse a failed
-    fit with a merely weak one.  ``compliance_info`` — when present
-    and flagged — renders an additional "Compliance" row below the
-    numbers, carrying the provenance of any clipped-point handling.
-    When a 95 % CI was computed, a second-line CI hint is appended
-    under the T_e row so the number is never shown without its
-    uncertainty context.
-    """
-    if fit_dict is None:
-        return ""
-    import html as _html
-    from dlp_fit_models import FitStatus, FAILURE_STATUSES
-
-    def _is_nan(x) -> bool:
-        try:
-            return isinstance(x, float) and x != x
-        except Exception:
-            return False
-
-    te = fit_dict.get("Te_eV")
-    te_err = fit_dict.get("Te_err_eV")
-    isat = fit_dict.get("I_sat_fit_A")
-    model = fit_dict.get("label", fit_dict.get("model_key", "?"))
-    r2 = fit_dict.get("R2")
-    nrmse = fit_dict.get("NRMSE")
-    grade = fit_dict.get("grade", "?")
-    grade_color = fit_dict.get("grade_color", "#888")
-
-    rows = []
-
-    # ── Fit-status banner ─────────────────────────────────────────
-    # A non-OK status is surfaced as the first row with a coloured
-    # label so the operator cannot mistake a failed fit for a merely
-    # poor one.  OK fits keep the original, compact layout.
-    fit_status = fit_dict.get("fit_status", FitStatus.OK)
-    if fit_status != FitStatus.OK:
-        reason = (fit_dict.get("fit_error_reason")
-                  or fit_dict.get("fit_warning_reason"))
-        if fit_status in FAILURE_STATUSES:
-            banner_color = "#f06060"  # red — fit untrustworthy
-            banner_label = "Fit failed"
-        else:  # POOR / WARNING — converged, flag only
-            banner_color = "#e0b050"
-            banner_label = "Fit warning"
-        status_cell = (f"<span style='color:{banner_color};"
-                       f" font-weight:600;'>{banner_label}: "
-                       f"{_html.escape(str(fit_status))}</span>")
-        if reason:
-            status_cell += (f"<br/><span style='color:#aab;"
-                            f" font-size:11px;'>"
-                            f"{_html.escape(str(reason))}</span>")
-        rows.append(f"<tr><td><b>Status</b></td><td>{status_cell}</td></tr>")
-
-    if te is not None and not _is_nan(te) and te_err is not None and not _is_nan(te_err):
-        te_html = f"{te:.3f} &#177; {te_err:.3f} eV"
-    elif te is not None and not _is_nan(te):
-        te_html = f"{te:.3f} eV"
-    else:
-        te_html = "<span style='color:#aa6'>n/a</span>"
-    # Attach the 95 % CI under the T_e line so the number is never
-    # presented without uncertainty context.  "covariance" is the
-    # always-on asymptotic form; "bootstrap" is the stronger opt-in.
-    ci_lo = fit_dict.get("Te_ci95_lo_eV")
-    ci_hi = fit_dict.get("Te_ci95_hi_eV")
-    ci_method = fit_dict.get("Te_ci_method", "unavailable")
-    if (ci_lo is not None and ci_hi is not None
-            and not _is_nan(ci_lo) and not _is_nan(ci_hi)):
-        label = ("bootstrap 95% CI"
-                 if ci_method == "bootstrap"
-                 else "95% CI (\u00b1z\u00b7\u03c3)")
-        te_html += (f"<br/><span style='color:#889;font-size:10px;'>"
-                    f"{label}: [{ci_lo:.3f}, {ci_hi:.3f}] eV</span>")
-    elif ci_method == "unavailable" and te is not None and not _is_nan(te):
-        te_html += ("<br/><span style='color:#988;font-size:10px;'>"
-                    "95% CI: unavailable</span>")
-    rows.append(f"<tr><td><b>T_e</b></td><td>{te_html}</td></tr>")
-
-    if isat is not None and not _is_nan(isat):
-        isat_html = f"{isat * 1e3:.3f} mA"
-    else:
-        isat_html = "<span style='color:#aa6'>n/a</span>"
-    # I_sat 95 % CI from the fit covariance — same honest conventions
-    # as the T_e CI row above.
-    isat_lo = fit_dict.get("I_sat_ci95_lo_A")
-    isat_hi = fit_dict.get("I_sat_ci95_hi_A")
-    isat_method = fit_dict.get("I_sat_ci_method", "unavailable")
-    if (isat_lo is not None and isat_hi is not None
-            and not _is_nan(isat_lo) and not _is_nan(isat_hi)):
-        isat_html += (f"<br/><span style='color:#889;font-size:10px;'>"
-                      f"95% CI: [{isat_lo * 1e3:.3f}, "
-                      f"{isat_hi * 1e3:.3f}] mA</span>")
-    elif isat_method == "unavailable" and isat is not None \
-            and not _is_nan(isat):
-        isat_html += ("<br/><span style='color:#988;font-size:10px;'>"
-                      "95% CI: unavailable</span>")
-    rows.append(f"<tr><td><b>I_sat</b></td><td>{isat_html}</td></tr>")
-
-    rows.append(f"<tr><td><b>Model</b></td><td>{model}</td></tr>")
-
-    fit_bits = []
-    if r2 is not None and not _is_nan(r2):
-        fit_bits.append(f"R&#178;={r2:.3f}")
-    if nrmse is not None and not _is_nan(nrmse):
-        fit_bits.append(f"NRMSE={nrmse:.1%}")
-    fit_bits.append(f"<span style='color:{grade_color}'>[{grade}]</span>")
-    rows.append(f"<tr><td><b>Fit</b></td><td>{', '.join(fit_bits)}</td></tr>")
-
-    if plasma_dict:
-        n_i = plasma_dict.get("n_i_m3")
-        gas = plasma_dict.get("ion_label", "")
-        if n_i is not None and not _is_nan(n_i):
-            tag = (f"<span style='color:#888'>(Bohm"
-                   f"{', ' + gas if gas else ''})</span>")
-            n_i_html = f"{n_i:.3e} m^-3 {tag}"
-            # n_i 95 % CI — label honestly by scope.  The note is
-            # "fit_only" / "fit+area" / "fit+mass" / "fit+area+mass"
-            # depending on which uncertainty inputs the operator
-            # supplied in the Double options dialog.  Probe area
-            # and ion mass are treated as exact *only* when the
-            # label literally says "fit_only".
-            n_lo = plasma_dict.get("n_i_ci95_lo_m3")
-            n_hi = plasma_dict.get("n_i_ci95_hi_m3")
-            n_method = plasma_dict.get("n_i_ci_method", "unavailable")
-            n_note = plasma_dict.get("n_i_ci_note", "fit_only")
-            n_label = n_note.replace("_", "-")
-            if (n_method != "unavailable"
-                    and n_lo is not None and n_hi is not None
-                    and not _is_nan(n_lo) and not _is_nan(n_hi)):
-                n_i_html += (
-                    f"<br/><span style='color:#889;font-size:10px;'>"
-                    f"95% CI ({n_label}): "
-                    f"[{n_lo:.3e}, {n_hi:.3e}] m^-3</span>")
-            elif n_method == "unavailable":
-                n_i_html += ("<br/><span style='color:#988;"
-                              "font-size:10px;'>n_i 95% CI: unavailable"
-                              "</span>")
-            rows.append(f"<tr><td><b>n_i</b></td><td>"
-                        f"{n_i_html}</td></tr>")
-
-    # Compliance / clipping provenance — always rendered when any
-    # point was flagged so the displayed T_e / I_sat carry their
-    # data-quality context on the same screen.
-    if compliance_info and int(compliance_info.get("n_flagged", 0)) > 0:
-        n_fl = int(compliance_info["n_flagged"])
-        n_to = int(compliance_info.get("n_total", 0))
-        frac = float(compliance_info.get("clipped_fraction", 0.0))
-        action = compliance_info.get("action", "n/a")
-        source = compliance_info.get("source", "operator_provided")
-        suspected = source == "heuristic_suspected"
-        label = "suspected clipping" if suspected else "clipped"
-        if action == "excluded_from_fit":
-            comp_color = "#bb8"
-            comp_text = (f"{n_fl}/{n_to} {label} point(s) excluded "
-                         f"from fit ({frac:.1%})")
-        elif action == "retained_in_fit":
-            comp_color = "#e0b050"
-            comp_text = (f"{n_fl}/{n_to} {label} point(s) retained "
-                         f"in fit ({frac:.1%}) — may bias T_e")
-        else:
-            comp_color = "#888"
-            comp_text = f"{n_fl}/{n_to} {label} point(s) ({frac:.1%})"
-        if suspected:
-            comp_text += (" <span style='color:#888;font-size:10px;'>"
-                          "(legacy heuristic)</span>")
-        rows.append(f"<tr><td><b>Compliance</b></td><td>"
-                    f"<span style='color:{comp_color}'>{comp_text}"
-                    f"</span></td></tr>")
-
-    cmp_html = ""
-    if comparison_list and len(comparison_list) > 1:
-        active_key = fit_dict.get("model_key")
-        cmp_rows = []
-        for entry in comparison_list:
-            marker = ("&#9654;" if entry.get("model_key") == active_key
-                      else "&nbsp;&nbsp;")
-            label = entry.get("label", entry.get("model_key", "?"))
-            te_e = entry.get("Te_eV"); r2_e = entry.get("R2")
-            te_str = (f"{te_e:.2f} eV" if te_e is not None
-                      and not _is_nan(te_e) else "&#8212;")
-            r2_str = (f"R&#178;={r2_e:.3f}" if r2_e is not None
-                      and not _is_nan(r2_e) else "")
-            color = entry.get("grade_color", "#888")
-            cmp_rows.append(
-                f"<tr><td>{marker}</td><td>{label}</td>"
-                f"<td>{te_str}</td>"
-                f"<td><span style='color:{color}'>{r2_str}</span></td></tr>")
-        cmp_html = (f"<div style='font-family:Consolas, monospace; "
-                    f"font-size:10px; margin-top:6px; color:#aac;'>"
-                    f"<b>Models:</b><table>"
-                    f"{''.join(cmp_rows)}</table></div>")
-
-    return (f"<div style='border:1px solid #58a; padding:8px; "
-            f"margin:8px 0; background:#222;'>"
-            f"<h3 style='color:#58a; margin:0 0 6px 0;'>"
-            f"Double-Probe Analysis</h3>"
-            f"<table style='font-family:Consolas, monospace;'>"
-            f"{''.join(rows)}</table>"
-            f"{cmp_html}</div>")
+from dlp_double_report import format_compact_double as _format_compact_double
+# _format_compact_double is kept as a re-export so existing tests
+# and any third-party callers that imported the private name from
+# this module continue to work.  The implementation now lives in
+# :mod:`dlp_double_report`.
 
 
 class LPMainWindow(DLPMainWindowV2):
@@ -266,9 +61,15 @@ class LPMainWindow(DLPMainWindowV2):
     :mod:`DoubleLangmuir_measure_v3` for backwards compatibility.
     """
 
+    #: Base window title.  Kept as a class constant so
+    #: :meth:`_refresh_window_title_for_sim` can reliably rebuild the
+    #: title (with or without a SIM marker) without losing the base
+    #: name after a connect/disconnect cycle.
+    _BASE_TITLE: str = "Langmuir Probe Measurement"
+
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Langmuir Probe Measurement")
+        self.setWindowTitle(self._BASE_TITLE)
 
         # Theme tracking — the base class applied DARK_THEME during
         # its own __init__; we mirror that here so the View menu's
@@ -299,8 +100,8 @@ class LPMainWindow(DLPMainWindowV2):
         # buttonToggled signal that we wired in _build_methods_group.
         try:
             self.btnMethodDouble.setChecked(True)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         # ── Wrong-method guard ─────────────────────────────────────
         # Snapshot the active method on every Start so the Analyze
@@ -310,8 +111,8 @@ class LPMainWindow(DLPMainWindowV2):
         self._last_single_analysis: dict | None = None
         try:
             self.btnStart.clicked.connect(self._stamp_dataset_method)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Re-route the Analyze button through our method-aware
         # dispatcher.  V2 connected ``_run_analysis`` directly; we
         # disconnect every existing slot first (single connection in
@@ -345,19 +146,15 @@ class LPMainWindow(DLPMainWindowV2):
                 "Open analysis settings for the active method "
                 "(Single → Single options; Double → fit-model "
                 "selection; Triple → no fit, closed-form math).")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
-        # ── CSV: inject Method tag into V2's save path ─────────────
-        # V2 overrides _save_csv and builds its own meta dict; the
-        # only seam that doesn't touch V2 is to wrap the
-        # ``write_csv`` reference inside the V2 module so V2's call
-        # routes through our wrapper.  The wrapper installs ONCE
-        # (idempotent) and reads the dataset method from a class-
-        # level registry (weak refs) rather than capturing ``self``,
-        # so test instances can be GC'd cleanly.
-        LPMainWindow._install_csv_method_wrapper()
-        LPMainWindow._csv_method_register(self)
+        # ── CSV: method-aware save routing handled via the V2 hook
+        # methods (``_csv_dataset_method`` / ``_make_csv_path``).  No
+        # monkey-patching or weakref registry required — LP overrides
+        # ``_csv_dataset_method`` below so every save goes to the
+        # right ``<base>/<method>/`` subfolder with the matching
+        # ``Method`` meta tag.
 
         # Mid-sweep method-button lock — see _set_sweep_ui override
         # below.  We deliberately do NOT wrap via instance attribute
@@ -370,14 +167,14 @@ class LPMainWindow(DLPMainWindowV2):
         self._single_overlay_lines: list = []
         try:
             self.btnStart.clicked.connect(self._clear_single_overlays)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Drop the plot legend on every Start click so a previous
         # analysis' legend does not linger over a fresh sweep.
         try:
             self.btnStart.clicked.connect(self._clear_plot_legend)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         # ── Load CSV + Migrate-Legacy buttons (next to Plot…) ──────
         # Adds two small action buttons to the existing plot-header
@@ -395,8 +192,8 @@ class LPMainWindow(DLPMainWindowV2):
         # Non-invasive startup hint when legacy data is still around.
         try:
             self._announce_legacy_data_if_present()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         # ── Main save path (persistent, shared by all probe types) ──
         # Load the operator-chosen base folder from the persistence
@@ -508,8 +305,8 @@ class LPMainWindow(DLPMainWindowV2):
         # the layout and re-add via the new row widget.
         try:
             layout.removeWidget(self.lblLog)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         layout.insertLayout(0, row)
 
     def _patch_append_log_for_history(self) -> None:
@@ -551,8 +348,8 @@ class LPMainWindow(DLPMainWindowV2):
             if attr is original:
                 try:
                     setattr(mod, "append_log", _wrapped)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    log.debug("ignored exception", exc_info=exc)
 
     @Slot(int)
     def _on_log_filter_changed(self, _index: int) -> None:
@@ -646,58 +443,132 @@ class LPMainWindow(DLPMainWindowV2):
         sb.addPermanentWidget(self._sb_version)
         try:
             self._sb_version.setText(f"v{self._resolve_app_version()}")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         self._refresh_status_bar()
+
+    #: Warning-amber used to flag a simulated instrument in the
+    #: status bar.  Picked from the existing fit-warning palette so
+    #: the SIM markers share the visual language of "the numbers you
+    #: see are not from real hardware".
+    _SIM_WARN_COLOR: str = "#e0b050"
+
+    def _sim_instrument_flags(self) -> tuple[bool, bool]:
+        """Return ``(smu_is_sim, k2000_is_sim)`` for the current
+        instrument handles.  Used by :meth:`_refresh_status_bar` and
+        :meth:`_refresh_window_title_for_sim` to decide whether to
+        surface the SIM markers.  Import errors on the Fake modules
+        fall back to *not simulated* so a missing fake module never
+        makes a real instrument look simulated."""
+        smu_sim = False
+        k2000_sim = False
+        try:
+            from fake_b2901 import FakeB2901
+            from fake_b2901_v2 import FakeB2901v2
+            smu_sim = self.smu is not None and isinstance(
+                self.smu, (FakeB2901, FakeB2901v2))
+        except Exception as exc:
+            log.debug("SMU sim probe failed: %s", exc, exc_info=exc)
+        try:
+            k2000_sim = (self.k2000 is not None
+                         and isinstance(self.k2000, FakeKeithley2000))
+        except Exception as exc:
+            log.debug("K2000 sim probe failed: %s", exc, exc_info=exc)
+        return smu_sim, k2000_sim
+
+    def _refresh_window_title_for_sim(self, smu_sim: bool,
+                                       k2000_sim: bool) -> None:
+        """Prefix the window title with a clear SIMULATION marker
+        whenever any connected instrument is a Fake*.  Reset to the
+        base title once every instrument is either real or
+        disconnected."""
+        if smu_sim and k2000_sim:
+            marker = "SIMULATION (SMU+K2000)"
+        elif smu_sim:
+            marker = "SIMULATION (SMU)"
+        elif k2000_sim:
+            marker = "SIMULATION (K2000)"
+        else:
+            marker = ""
+        new_title = (f"\u26a0 {marker} \u2014 {self._BASE_TITLE}"
+                     if marker else self._BASE_TITLE)
+        try:
+            if self.windowTitle() != new_title:
+                self.setWindowTitle(new_title)
+        except Exception as exc:
+            log.debug("window title update failed: %s", exc, exc_info=exc)
 
     def _refresh_status_bar(self) -> None:
         """Re-render each status-bar slot from the current window
         state.  Safe to call before the widgets exist (tests that
         stub pieces of the main window): the missing-slot guards
         keep it best-effort."""
+        smu_sim, k2000_sim = self._sim_instrument_flags()
         # SMU
         try:
             if self.smu is None:
                 text, color = "SMU: disconnected", "#c0c8d8"
+                tooltip = ""
+            elif smu_sim:
+                text = "SMU: SIM"
+                color = self._SIM_WARN_COLOR
+                tooltip = ("Simulated SMU \u2014 data is NOT from real "
+                           "hardware.  Uncheck 'Sim' in the Instrument "
+                           "group and reconnect to return to live "
+                           "measurements.")
             else:
                 idn = (self.lblIdn.text() if hasattr(self, "lblIdn")
                        else "") or "connected"
                 short = idn.split(",")[1].strip() if "," in idn else idn
                 text, color = f"SMU: {short}", self._theme["led_green"]
+                tooltip = (self.lblIdn.text()
+                           if hasattr(self, "lblIdn") else "")
             if hasattr(self, "_sb_smu"):
+                # Bold + coloured in sim mode so the marker reads at a
+                # glance next to the real-instrument entries.
+                weight = "bold" if smu_sim else "normal"
                 self._sb_smu.setText(text)
                 self._sb_smu.setStyleSheet(
-                    f"padding: 0 8px; color: {color};")
-                self._sb_smu.setToolTip(
-                    self.lblIdn.text() if hasattr(self, "lblIdn") else "")
-        except Exception:
-            pass
+                    f"padding: 0 8px; color: {color}; "
+                    f"font-weight: {weight};")
+                self._sb_smu.setToolTip(tooltip)
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # K2000
         try:
             if self.k2000 is None:
                 text, color = "K2000: disconnected", "#c0c8d8"
+                tooltip = ""
+            elif k2000_sim:
+                text = "K2000: SIM"
+                color = self._SIM_WARN_COLOR
+                tooltip = ("Simulated K2000 \u2014 voltages are synthetic. "
+                           "Uncheck 'Sim' in the Multimeter group and "
+                           "reconnect for real GPIB/RS232 readings.")
             else:
                 idn = (self.lblK2000Idn.text()
                        if hasattr(self, "lblK2000Idn") else "") or "connected"
                 short = idn.split(",")[1].strip() if "," in idn else idn
                 text, color = f"K2000: {short}", self._theme["led_green"]
+                tooltip = (self.lblK2000Idn.text()
+                           if hasattr(self, "lblK2000Idn") else "")
             if hasattr(self, "_sb_k2000"):
+                weight = "bold" if k2000_sim else "normal"
                 self._sb_k2000.setText(text)
                 self._sb_k2000.setStyleSheet(
-                    f"padding: 0 8px; color: {color};")
-                self._sb_k2000.setToolTip(
-                    self.lblK2000Idn.text()
-                    if hasattr(self, "lblK2000Idn") else "")
-        except Exception:
-            pass
+                    f"padding: 0 8px; color: {color}; "
+                    f"font-weight: {weight};")
+                self._sb_k2000.setToolTip(tooltip)
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Method
         try:
             method = self._current_active_method()
             if hasattr(self, "_sb_method"):
                 self._sb_method.setText(
                     f"Method: {method.capitalize()}")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Save path — truncated with full path in tooltip.
         try:
             folder = getattr(self, "_save_folder", None)
@@ -705,8 +576,11 @@ class LPMainWindow(DLPMainWindowV2):
                 short = self._shorten_path_for_menu(str(folder), 50)
                 self._sb_save.setText(f"Save: {short}")
                 self._sb_save.setToolTip(str(folder))
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
+        # Window title — last, so it also picks up a sim-state change
+        # when only the title (not the slots) needs an update.
+        self._refresh_window_title_for_sim(smu_sim, k2000_sim)
 
     # ------------------------------------------------------------------
     # Persistent UI state (theme + geometry)
@@ -737,8 +611,8 @@ class LPMainWindow(DLPMainWindowV2):
         if theme_name in ("dark", "light") and theme_name != self._theme_name:
             try:
                 self._apply_theme_by_name(theme_name, persist=False)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         # Window geometry.  QByteArray comes through json as a base64
         # ASCII string; QByteArray.fromBase64 handles an empty input
         # gracefully.
@@ -748,8 +622,8 @@ class LPMainWindow(DLPMainWindowV2):
                 from PySide6.QtCore import QByteArray
                 self.restoreGeometry(
                     QByteArray.fromBase64(geom.encode("ascii")))
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         # Main horizontal splitter (three columns: controls / plot /
         # K2000+log).  We restore only the object we know how to look
         # up — the inner vertical splitter ("splitThird") is restored
@@ -762,8 +636,8 @@ class LPMainWindow(DLPMainWindowV2):
                 from PySide6.QtCore import QByteArray
                 sp.restoreState(
                     QByteArray.fromBase64(split_main.encode("ascii")))
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         split_third = state.get("splitter_third")
         st = getattr(self, "_splitter_third", None)
         if st is not None and isinstance(split_third, str) and split_third:
@@ -771,8 +645,8 @@ class LPMainWindow(DLPMainWindowV2):
                 from PySide6.QtCore import QByteArray
                 st.restoreState(
                     QByteArray.fromBase64(split_third.encode("ascii")))
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
     def _collect_ui_state(self) -> dict:
         """Snapshot the persistable UI state into a plain dict."""
@@ -781,22 +655,22 @@ class LPMainWindow(DLPMainWindowV2):
             geom_ba = self.saveGeometry()
             state["window_geometry"] = bytes(
                 geom_ba.toBase64()).decode("ascii")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         sp = getattr(self, "_splitter_main", None)
         if sp is not None:
             try:
                 state["splitter_main"] = bytes(
                     sp.saveState().toBase64()).decode("ascii")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         st = getattr(self, "_splitter_third", None)
         if st is not None:
             try:
                 state["splitter_third"] = bytes(
                     st.saveState().toBase64()).decode("ascii")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         return state
 
     def _apply_theme_by_name(self, name: str, *, persist: bool = True) -> None:
@@ -814,8 +688,8 @@ class LPMainWindow(DLPMainWindowV2):
         self._theme_name = name
         try:
             self.setStyleSheet(build_stylesheet(t))
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Re-seat the LED colours so they match the new palette's
         # led_grey / led_green values instead of the previous theme's.
         for attr, state_attr, green_key in (
@@ -836,16 +710,16 @@ class LPMainWindow(DLPMainWindowV2):
                     connected = False
                 set_led(led,
                         t[green_key] if connected else t["led_grey"])
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         if persist:
             try:
                 from paths import load_ui_state, store_ui_state
                 state = load_ui_state()
                 state["theme"] = name
                 store_ui_state(state)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
             append_log(self, f"Theme switched to '{name}'.", "info")
 
     # ------------------------------------------------------------------
@@ -900,8 +774,8 @@ class LPMainWindow(DLPMainWindowV2):
                 continue
             try:
                 spn.valueChanged.connect(self._validate_sweep_params)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         self._validate_sweep_params()
 
     @Slot()
@@ -938,13 +812,13 @@ class LPMainWindow(DLPMainWindowV2):
         try:
             if self.spnCompl.value() <= 0:
                 issues["spnCompl"] = "Compliance must be positive."
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         try:
             if self.spnSettle.value() <= 0:
                 issues["spnSettle"] = "Settle must be positive."
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         # Power-envelope interlock: |V_max|\u00b7I_compl must stay at
         # or below SMU_MAX_POWER_W.  The check runs even if other
@@ -964,8 +838,8 @@ class LPMainWindow(DLPMainWindowV2):
                 issues.setdefault(
                     "spnVstart" if abs(vstart) >= abs(vstop) else "spnVstop",
                     reason_power)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         for attr in ("spnVstart", "spnVstop", "spnVstep", "spnCompl",
                      "spnSettle"):
@@ -985,8 +859,8 @@ class LPMainWindow(DLPMainWindowV2):
                 else:
                     spn.setStyleSheet("")
                     spn.setToolTip(self._base_tooltip_for(attr))
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
         btn_start = getattr(self, "btnStart", None)
         if btn_start is not None:
@@ -1008,8 +882,8 @@ class LPMainWindow(DLPMainWindowV2):
                 elif not running:
                     # Reset to the original shortcut-annotated tooltip.
                     btn_start.setToolTip("Start sweep  (F5)")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
     @staticmethod
     def _base_tooltip_for(attr: str) -> str:
@@ -1042,8 +916,8 @@ class LPMainWindow(DLPMainWindowV2):
                 continue
             try:
                 spn.setSuffix(suffix)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
     def _install_action_shortcuts(self) -> None:
         """Bind F5 → Start, Esc → Stop shortcuts.
@@ -1062,8 +936,8 @@ class LPMainWindow(DLPMainWindowV2):
                 tip = btn_start.toolTip() or "Start sweep"
                 if "F5" not in tip:
                     btn_start.setToolTip(tip + "  (F5)")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         btn_stop = getattr(self, "btnStop", None)
         if btn_stop is not None:
             try:
@@ -1071,8 +945,8 @@ class LPMainWindow(DLPMainWindowV2):
                 tip = btn_stop.toolTip() or "Stop sweep"
                 if "Esc" not in tip:
                     btn_stop.setToolTip(tip + "  (Esc)")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
     # ------------------------------------------------------------------
     # Main save path — persistent, shared by Single / Double / Triple
@@ -1102,14 +976,14 @@ class LPMainWindow(DLPMainWindowV2):
                 "(single / double / triple) underneath.\n"
                 "The chosen path is remembered across program "
                 "restarts.")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         try:
             grp = getattr(self, "_grp_file", None)
             if grp is not None:
                 grp.setTitle("Main save folder (single / double / triple)")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     def _browse_folder(self):
         """Override: persist the chosen main save folder so it
@@ -1126,8 +1000,8 @@ class LPMainWindow(DLPMainWindowV2):
         self._save_folder = _P(d)
         try:
             self.lblFolder.setText(str(self._save_folder))
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         try:
             from paths import store_main_save_path
             store_main_save_path(self._save_folder)
@@ -1148,8 +1022,8 @@ class LPMainWindow(DLPMainWindowV2):
                 log.warning("LP window base-save-dir refresh failed: %s", exc)
         try:
             self._refresh_status_bar()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     # ------------------------------------------------------------------
     # UI
@@ -1360,8 +1234,8 @@ class LPMainWindow(DLPMainWindowV2):
                 left_v = getattr(self, "_left_v_layout", None)
                 if left_v is not None:
                     left_v.removeWidget(grp_ctrl)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
             try:
                 grp_ctrl.setParent(None)
                 third.addWidget(grp_ctrl)
@@ -1521,8 +1395,8 @@ class LPMainWindow(DLPMainWindowV2):
             append_log(self, "K2000 disconnected.", "info")
             try:
                 self._refresh_status_bar()
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
             return
 
         if self.chkK2000Sim.isChecked():
@@ -1565,8 +1439,8 @@ class LPMainWindow(DLPMainWindowV2):
         append_log(self, f"K2000 connected ({label}): {idn}", "ok")
         try:
             self._refresh_status_bar()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Record the resource that just worked so the discovery
         # window + next app launch keep it as the default.  Only the
         # real-hardware paths update the cache; sim mode does not
@@ -1584,8 +1458,9 @@ class LPMainWindow(DLPMainWindowV2):
                         visa = (self.editK2000Visa.text().strip()
                                 or DEFAULT_K2000_VISA)
                         cache.mark_successful(self.K2000_CACHE_KEY, visa)
-        except Exception:
-            pass  # cache persistence is best-effort; connect succeeded.
+        except Exception as exc:
+            # cache persistence is best-effort; connect succeeded.
+            log.debug("VISA cache persist failed: %s", exc, exc_info=exc)
         # Push the operator-chosen options to the freshly-connected
         # instrument.  Idempotent on the fake, cheap SCPI writes on
         # the real K2000.  Errors are logged as warnings, never
@@ -1812,14 +1687,14 @@ class LPMainWindow(DLPMainWindowV2):
         candidates: list[_P] = []
         try:
             candidates.append(_P(__file__).resolve().parent / "README.md")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         if getattr(sys, "frozen", False):
             try:
                 candidates.append(
                     _P(sys.executable).resolve().parent / "README.md")
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         for p in candidates:
             if p.exists():
                 QDesktopServices.openUrl(QUrl.fromLocalFile(str(p)))
@@ -1866,8 +1741,8 @@ class LPMainWindow(DLPMainWindowV2):
                     capture_output=True, text=True, timeout=2.0)
                 if out.returncode == 0 and out.stdout.strip():
                     return out.stdout.strip()
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         return "stable-v3"
 
     # ------------------------------------------------------------------
@@ -2061,8 +1936,9 @@ class LPMainWindow(DLPMainWindowV2):
             else:
                 self.cmbK2000Transport.setCurrentText("GPIB")
                 self.editK2000Visa.setText(last)
-        except Exception:
-            pass  # Never block window construction on cache I/O.
+        except Exception as exc:
+            # Never block window construction on cache I/O.
+            log.debug("K2000 cache restore failed: %s", exc, exc_info=exc)
 
     # ------------------------------------------------------------------
     # K2000 options
@@ -2143,8 +2019,8 @@ class LPMainWindow(DLPMainWindowV2):
             try:
                 # V_d13 ≈ 3 V → Te = V_d13 / ln 2 ≈ 4.33 eV.
                 self.k2000.set_voltage_for_test(3.0)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
             self._lp_sim_current_a = -3.0e-4
         else:
             self._lp_sim_current_a = None
@@ -2294,13 +2170,13 @@ class LPMainWindow(DLPMainWindowV2):
             btn.setText(label)
             btn.setToolTip(tip)
             btn.setEnabled(mode != "triple")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         # Keep the status-bar method slot in lockstep with the button.
         try:
             self._refresh_status_bar()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     def _apply_method_mode(self, mode: str) -> None:
         """Set the SMU-relevant defaults for the chosen method mode.
@@ -2325,8 +2201,8 @@ class LPMainWindow(DLPMainWindowV2):
         # pipeline (Single's V_f/V_p vs. Double's tanh fit etc.).
         try:
             self._clear_plot_legend()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         defaults = self.METHOD_MODE_DEFAULTS.get(mode)
         sim_model = self.METHOD_MODE_SIM_MODELS.get(mode)
         if defaults is None or sim_model is None:
@@ -2396,8 +2272,8 @@ class LPMainWindow(DLPMainWindowV2):
             # Keep Start disabled so the UI stays consistent.
             try:
                 self.btnStart.setEnabled(False)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
             return
         super()._start_sweep()
 
@@ -2430,8 +2306,8 @@ class LPMainWindow(DLPMainWindowV2):
                 try:
                     btn.setEnabled(True)
                     btn.setText(prev_text or "Scan")
-                except Exception:
-                    pass
+                except Exception as exc:
+                    log.debug("ignored exception", exc_info=exc)
 
     def _toggle_connect(self):
         """Override: ensure the sim path picks up the method-specific
@@ -2448,8 +2324,8 @@ class LPMainWindow(DLPMainWindowV2):
         super()._toggle_connect()
         try:
             self._refresh_status_bar()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     def _current_sim_model(self) -> str:
         """Return the sim IV model implied by the active method button.
@@ -2463,8 +2339,8 @@ class LPMainWindow(DLPMainWindowV2):
                 return "single_probe"
             if self.btnMethodTriple.isChecked():
                 return "double_langmuir"
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         return "double_langmuir"
 
     def _build_lp_probe_area_m2(self) -> float:
@@ -2489,8 +2365,8 @@ class LPMainWindow(DLPMainWindowV2):
             )
             if mm2 > 0:
                 return mm2 * 1e-6
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         return float(DEFAULT_AREA_M2)
 
     def _build_lp_gas_context(self):
@@ -2543,11 +2419,14 @@ class LPMainWindow(DLPMainWindowV2):
     def _on_triple_running_changed(self, running: bool) -> None:
         """Mutex sweep ↔ triple: while triple runs, lock the Sweep
         Start button so the operator cannot launch a parallel sweep
-        on the same SMU."""
+        on the same SMU.  Also tracks the running state on a plain
+        attribute so :meth:`closeEvent` can refuse an accidental close
+        mid-Triple without having to reach into the LP sub-window."""
+        self._triple_running = bool(running)
         try:
             self.btnStart.setEnabled(not running)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("btnStart.setEnabled failed: %s", exc)
 
     # ------------------------------------------------------------------
     # Cleaning method
@@ -2605,8 +2484,8 @@ class LPMainWindow(DLPMainWindowV2):
                 return "single"
             if self.btnMethodTriple.isChecked():
                 return "triple"
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         return "double"
 
     @Slot()
@@ -2948,61 +2827,26 @@ class LPMainWindow(DLPMainWindowV2):
                        f"{type(exc).__name__}: {exc}", "warn")
 
     # ------------------------------------------------------------------
-    # CSV write_csv wrapper — class-level, weak-ref based
+    # CSV routing — override the V2 hook methods
     # ------------------------------------------------------------------
-    _csv_method_refs: list = []  # weakref.ref to live LPMainWindow instances
+    def _csv_dataset_method(self) -> str:
+        """Return the live dataset method for CSV routing + tagging.
 
-    @classmethod
-    def _most_recent_dataset_method(cls) -> str:
-        """Best-effort lookup of the most-recent live LPMainWindow's
-        ``_dataset_method``.  Drops dead weakrefs as it walks.
-        Returns ``"double"`` as a defensive fallback when no live
-        instance carries a tag — matches the historic default."""
-        method = "double"
-        live = []
-        for ref in cls._csv_method_refs:
-            inst = ref()
-            if inst is not None:
-                live.append(ref)
-                cur = getattr(inst, "_dataset_method", None)
-                if cur:
-                    method = cur
-        cls._csv_method_refs = live
-        return method
-
-    @classmethod
-    def _install_csv_method_wrapper(cls) -> None:
-        """Install the once-only V2-module patches for ``write_csv``
-        and ``make_csv_path``.  Both wrappers consult the weakref
-        registry rather than capturing any instance strongly — keeps
-        test teardown clean.
-
-          * ``write_csv``     — injects the ``Method`` meta key
-          * ``make_csv_path`` — routes the save into ``<base>/<method>/``
-                                with the unified ``LP_<ts>_<method>.csv``
-                                naming scheme.
+        Overrides the V1/V2 default (always ``"double"``) with the
+        per-instance tag stamped at Start click.  When no tag has been
+        set yet (e.g. a CSV is saved before any Start — uncommon but
+        possible in scripted setups) the historic default is kept so
+        legacy readers remain happy.
         """
-        import DoubleLangmuir_measure_v2 as _v2_mod
-        if not getattr(_v2_mod.write_csv, "_lp_method_tagged", False):
-            _orig_write = _v2_mod.write_csv
-            def _wrapped_write(path, meta, *args, **kwargs):
-                if isinstance(meta, dict) and "Method" not in meta:
-                    meta["Method"] = cls._most_recent_dataset_method()
-                return _orig_write(path, meta, *args, **kwargs)
-            _wrapped_write._lp_method_tagged = True
-            _v2_mod.write_csv = _wrapped_write
-        if not getattr(_v2_mod.make_csv_path, "_lp_method_routed", False):
-            from dlp_save_paths import make_lp_csv_path_for_method
-            def _wrapped_path(folder, prefix="DLP", method=None):
-                m = method or cls._most_recent_dataset_method()
-                return make_lp_csv_path_for_method(folder, m)
-            _wrapped_path._lp_method_routed = True
-            _v2_mod.make_csv_path = _wrapped_path
+        return (getattr(self, "_dataset_method", None) or "double")
 
-    @classmethod
-    def _csv_method_register(cls, instance) -> None:
-        import weakref
-        cls._csv_method_refs.append(weakref.ref(instance))
+    def _make_csv_path(self, folder):
+        """Route the CSV save into ``<base>/<method>/`` with the
+        unified ``LP_<ts>_<method>.csv`` naming scheme, without
+        touching the module-level :func:`make_csv_path` function."""
+        from dlp_save_paths import make_lp_csv_path_for_method
+        return make_lp_csv_path_for_method(
+            folder, self._csv_dataset_method())
 
     # ------------------------------------------------------------------
     # Compact Double-probe analysis output + compliance-aware filter
@@ -3089,8 +2933,8 @@ class LPMainWindow(DLPMainWindowV2):
                                f"Double analyze: fwd/rev branches "
                                f"diverge {pct:.1f}% — possible "
                                "plasma drift during sweep.", "warn")
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
         comp_info = getattr(self, "_last_compliance_info", None)
         compact = _format_compact_double(fit, plasma, cmp_list,
@@ -3146,8 +2990,8 @@ class LPMainWindow(DLPMainWindowV2):
         if not running:
             try:
                 self._validate_sweep_params()
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
 
     def _lock_method_buttons_during_sweep(self, running: bool) -> None:
         """While a sweep is running, refuse Single/Double/Triple
@@ -3160,8 +3004,8 @@ class LPMainWindow(DLPMainWindowV2):
                 continue
             try:
                 btn.setEnabled(not running)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         if running:
             append_log(self,
                        "Method buttons locked during sweep — switching "
@@ -3179,13 +3023,13 @@ class LPMainWindow(DLPMainWindowV2):
         for line in self._single_overlay_lines:
             try:
                 line.remove()
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         self._single_overlay_lines.clear()
         try:
             self.canvas.draw_idle()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     def _clear_plot_legend(self) -> None:
         """Drop the plot legend and any stale analysis-overlay data.
@@ -3210,8 +3054,8 @@ class LPMainWindow(DLPMainWindowV2):
             leg = ax.get_legend()
             if leg is not None:
                 leg.remove()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         for attr in ("line_fit_pos", "line_fit_neg",
                      "line_corrected", "line_te_fit"):
             ln = getattr(self, attr, None)
@@ -3219,8 +3063,8 @@ class LPMainWindow(DLPMainWindowV2):
                 continue
             try:
                 ln.set_data([], [])
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("ignored exception", exc_info=exc)
         # Shading patches from Double's fit-region highlight are
         # tracked in _fit_shading; clear those too so the next legend
         # is not polluted by the previous sweep's fit-region hints.
@@ -3229,17 +3073,17 @@ class LPMainWindow(DLPMainWindowV2):
             for p in patches:
                 try:
                     p.remove()
-                except Exception:
-                    pass
+                except Exception as exc:
+                    log.debug("ignored exception", exc_info=exc)
             patches.clear()
         try:
             self._clear_single_overlays()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         try:
             self.canvas.draw_idle()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     def _draw_single_overlays(self, result: dict) -> None:
         """Draw V_f (solid green) and V_p (dashed magenta for medium
@@ -3274,8 +3118,8 @@ class LPMainWindow(DLPMainWindowV2):
         try:
             ax.legend(fontsize=8)
             canvas.draw_idle()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
 
     # ------------------------------------------------------------------
     # Load CSV (with Method tag) — UI + handler
@@ -3335,8 +3179,8 @@ class LPMainWindow(DLPMainWindowV2):
         try:
             from paths import add_recent_csv_file
             add_recent_csv_file(path)
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("ignored exception", exc_info=exc)
         return meta
 
     # ------------------------------------------------------------------
@@ -3621,7 +3465,56 @@ class LPMainWindow(DLPMainWindowV2):
     # ------------------------------------------------------------------
     # Cleanup
     # ------------------------------------------------------------------
+    def _busy_operations(self) -> list[str]:
+        """Return human labels for every measurement currently in
+        flight that a close would interrupt.  Used by
+        :meth:`closeEvent` to decide whether to prompt before tearing
+        the window down."""
+        busy: list[str] = []
+        try:
+            btn_stop = getattr(self, "btnStop", None)
+            if btn_stop is not None and btn_stop.isEnabled():
+                busy.append("a sweep")
+        except Exception as exc:
+            log.debug("btnStop probe failed: %s", exc)
+        if getattr(self, "_triple_running", False):
+            busy.append("the Triple-probe measurement")
+        return busy
+
+    def _confirm_close_during_busy(self, busy: list[str]) -> bool:
+        """Ask the operator whether to close despite running work.
+        Returns True when the close should proceed."""
+        import os as _os
+        if _os.environ.get("QT_QPA_PLATFORM") == "offscreen":
+            # Headless tests never prompt — they always proceed.
+            return True
+        from PySide6.QtWidgets import QMessageBox
+        what = " and ".join(busy)
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Warning)
+        box.setWindowTitle("Close while measurement is running?")
+        box.setText(
+            f"{what.capitalize()} is still running.\n\n"
+            "Closing now will interrupt it and may leave the SMU "
+            "output enabled until the next connect.\n\n"
+            "Close anyway?")
+        box.setStandardButtons(QMessageBox.StandardButton.Yes
+                               | QMessageBox.StandardButton.Cancel)
+        box.setDefaultButton(QMessageBox.StandardButton.Cancel)
+        return box.exec() == QMessageBox.StandardButton.Yes
+
     def closeEvent(self, event):
+        # Prompt before closing while a sweep or Triple-probe
+        # measurement is active — avoids a stray SMU output state
+        # and accidentally interrupted runs.
+        busy = self._busy_operations()
+        if busy and not self._confirm_close_during_busy(busy):
+            event.ignore()
+            append_log(self,
+                       "Close cancelled — finish or stop the running "
+                       "measurement first.", "info")
+            return
+
         # Persist the operator's theme + geometry + splitter positions
         # before tearing down so the next launch feels like the same
         # session.  Best-effort: a persist failure never blocks close.
@@ -3634,13 +3527,13 @@ class LPMainWindow(DLPMainWindowV2):
                 state = load_ui_state()
                 state.update(self._collect_ui_state())
                 store_ui_state(state)
-            except Exception:
-                pass
+            except Exception as exc:
+                log.debug("UI state persist failed: %s", exc)
         try:
             if self.k2000 is not None:
                 self.k2000.close()
-        except Exception:
-            pass
+        except Exception as exc:
+            log.debug("K2000 close failed: %s", exc)
         super().closeEvent(event)
 
 

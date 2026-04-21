@@ -776,9 +776,32 @@ class DLPMainWindow(QMainWindow):
 
     # ── CSV ───────────────────────────────────────────────────────
 
+    def _csv_dataset_method(self) -> str:
+        """Resolve the acquisition-method tag used both for the CSV
+        subfolder routing and the ``Method`` meta key.
+
+        Subclasses (e.g. :class:`LPmeasurement.LPMainWindow`) override
+        this to return the live dataset method.  The default here
+        falls back to ``"double"`` so V1-only installations keep the
+        historic behaviour.
+        """
+        return (getattr(self, "_dataset_method", None) or "double")
+
+    def _make_csv_path(self, folder):
+        """Hook around :func:`make_csv_path` so subclasses can route
+        saves into a per-method subfolder without monkey-patching the
+        module-level function."""
+        return make_csv_path(folder, method=self._csv_dataset_method())
+
+    def _write_csv(self, path, meta, *args, **kwargs):
+        """Hook around :func:`write_csv` so subclasses can inject meta
+        keys or redirect the write without monkey-patching the
+        module-level function."""
+        return write_csv(path, meta, *args, **kwargs)
+
     def _save_csv(self, run_status: str = "completed",
                    failure_reason: str = ""):
-        path = make_csv_path(self._save_folder)
+        path = self._make_csv_path(self._save_folder)
         meta = {
             "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "Instrument": self.lblIdn.text(),
@@ -796,16 +819,14 @@ class DLPMainWindow(QMainWindow):
         }
         if failure_reason:
             meta["Failure_Reason"] = failure_reason
-        # Acquisition method tag — set by LPMainWindow.__init__ via
-        # _stamp_dataset_method on every Start click.  Older subclasses
-        # that don't carry the attribute fall through to "double" so
-        # legacy CSVs remain self-describing.
-        meta["Method"] = (getattr(self, "_dataset_method", None)
-                           or "double")
+        # Acquisition method tag — resolved through the hook so V1 and
+        # V2 share the same source of truth and LP-level subclasses
+        # can override it without monkey-patching.
+        meta["Method"] = self._csv_dataset_method()
         try:
-            write_csv(path, meta, self._v_soll, self._i_mean,
-                      self._i_std, self._v_ist,
-                      self._directions, self._compliance)
+            self._write_csv(path, meta, self._v_soll, self._i_mean,
+                            self._i_std, self._v_ist,
+                            self._directions, self._compliance)
             # Remember the written path so the Analyze path can place
             # the options sidecar next to it.  Cleared on reload via
             # load_csv_dataset so stale references don't leak.

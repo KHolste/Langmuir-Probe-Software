@@ -7657,3 +7657,2451 @@ Models:
   - tanh + slope: T_e=3.00 eV R^2=1.0000
   - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
 
+=== 2026-04-21T06:56:30 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T06:57:47 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:41 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:43 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:44 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-28.00 V (13 pts), pos>=28.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-12.00 V (29 pts), pos>=12.00 V (29 pts)
+Models:
+  - Simple tanh: T_e=2.92 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:00:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:03 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:05 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:06 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:06 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:06 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope + asymmetry
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:06 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:07 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:09 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:09 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:09 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:09 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:09 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:12 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:12 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-31.27 V (15 pts), pos>=24.94 V (15 pts)
+Compliance = 5/80 flagged (6.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.98 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:12 ===
+Status       = poor
+Warning      = 20 of 80 points excluded (compliance-flagged, 25.0%); remaining data may be under-sampled in saturation — T_e likely unreliable
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-35.06 V (12 pts), pos>=9.75 V (12 pts)
+Compliance = 20/80 flagged (25.0%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.38 eV R^2=0.9982
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:12 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.861, NRMSE=56.9%) — check for compliance clipping, noise, or model mismatch
+T_e  = 2.762 +- 1.578 eV
+T_e 95% CI (covariance) = [-0.330, 5.855] eV
+I_sat = 1.473e-03 A
+I_sat 95% CI (covariance) = [8.361e-04, 2.109e-03] A
+R^2   = 0.8615
+NRMSE = 56.87 %
+Model = tanh + slope
+n_i   = 1.133e+18 m^-3 (v_B=2583 m/s, Ar)
+n_i 95% CI (fit-only) = [3.316e+17, 1.934e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=0.34 eV R^2=0.0177
+  - tanh + slope: T_e=2.76 eV R^2=0.8615
+  - tanh + slope + asymmetry: T_e=2.83 eV R^2=0.8637
+
+=== 2026-04-21T07:01:12 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.25 V (16 pts), pos>=28.99 V (16 pts)
+Compliance = 1/80 flagged (1.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:13 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.968, NRMSE=17.7%) — check for compliance clipping, noise, or model mismatch
+T_e  = 4.000 +- 0.491 eV
+T_e 95% CI (covariance) = [3.038, 4.962] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [1.751e-03, 2.249e-03] A
+R^2   = 0.9683
+NRMSE = 17.68 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.057e+18, 1.499e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=0.9635
+  - tanh + slope: T_e=4.00 eV R^2=0.9683
+  - tanh + slope + asymmetry: T_e=3.78 eV R^2=0.9826
+
+=== 2026-04-21T07:01:13 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:13 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.95 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:13 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:13 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:15 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:15 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:15 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.99 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:20 ===
+Status       = poor
+Warning      = 10 of 80 compliance-flagged points retained in fit (12.5%); clipped plateau biases T_e and I_sat — switch to exclude_clipped or re-acquire with higher compliance
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Compliance = 10/80 flagged (12.5%), action=retained_in_fit
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:36 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:38 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:39 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-28.00 V (13 pts), pos>=28.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-12.00 V (29 pts), pos>=12.00 V (29 pts)
+Models:
+  - Simple tanh: T_e=2.92 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:58 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:01:59 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:00 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:00 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:00 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope + asymmetry
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:01 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:01 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:02 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:04 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:07 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:07 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-31.27 V (15 pts), pos>=24.94 V (15 pts)
+Compliance = 5/80 flagged (6.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.98 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:07 ===
+Status       = poor
+Warning      = 20 of 80 points excluded (compliance-flagged, 25.0%); remaining data may be under-sampled in saturation — T_e likely unreliable
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-35.06 V (12 pts), pos>=9.75 V (12 pts)
+Compliance = 20/80 flagged (25.0%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.38 eV R^2=0.9982
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:07 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.861, NRMSE=56.9%) — check for compliance clipping, noise, or model mismatch
+T_e  = 2.762 +- 1.578 eV
+T_e 95% CI (covariance) = [-0.330, 5.855] eV
+I_sat = 1.473e-03 A
+I_sat 95% CI (covariance) = [8.361e-04, 2.109e-03] A
+R^2   = 0.8615
+NRMSE = 56.87 %
+Model = tanh + slope
+n_i   = 1.133e+18 m^-3 (v_B=2583 m/s, Ar)
+n_i 95% CI (fit-only) = [3.316e+17, 1.934e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=0.34 eV R^2=0.0177
+  - tanh + slope: T_e=2.76 eV R^2=0.8615
+  - tanh + slope + asymmetry: T_e=2.83 eV R^2=0.8637
+
+=== 2026-04-21T07:02:07 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.25 V (16 pts), pos>=28.99 V (16 pts)
+Compliance = 1/80 flagged (1.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:07 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.968, NRMSE=17.7%) — check for compliance clipping, noise, or model mismatch
+T_e  = 4.000 +- 0.491 eV
+T_e 95% CI (covariance) = [3.038, 4.962] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [1.751e-03, 2.249e-03] A
+R^2   = 0.9683
+NRMSE = 17.68 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.057e+18, 1.499e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=0.9635
+  - tanh + slope: T_e=4.00 eV R^2=0.9683
+  - tanh + slope + asymmetry: T_e=3.78 eV R^2=0.9826
+
+=== 2026-04-21T07:02:08 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:08 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.95 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:08 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:08 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:10 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:10 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:10 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.99 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:14 ===
+Status       = poor
+Warning      = 10 of 80 compliance-flagged points retained in fit (12.5%); clipped plateau biases T_e and I_sat — switch to exclude_clipped or re-acquire with higher compliance
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Compliance = 10/80 flagged (12.5%), action=retained_in_fit
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:28 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:31 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:31 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:45 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:46 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-28.00 V (13 pts), pos>=28.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:46 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-12.00 V (29 pts), pos>=12.00 V (29 pts)
+Models:
+  - Simple tanh: T_e=2.92 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:46 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:46 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:47 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:47 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:47 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:51 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:51 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:52 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:53 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope + asymmetry
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:53 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:54 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:55 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:55 ===
+T_e  = 2.972 +- 0.003 eV
+T_e 95% CI (covariance) = [2.966, 2.978] eV
+I_sat = 1.985e-03 A
+I_sat 95% CI (covariance) = [1.984e-03, 1.986e-03] A
+R^2   = 1.0000
+NRMSE = 0.14 %
+Model = Simple tanh
+n_i   = 1.472e+18 m^-3 (v_B=2679 m/s, Ar)
+n_i 95% CI (fit-only) = [1.470e+18, 1.474e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:56 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:56 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:56 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:56 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:57 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-18.00 V (13 pts), pos>=18.00 V (13 pts)
+Models:
+  - Simple tanh: T_e=2.97 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:59 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:59 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-31.27 V (15 pts), pos>=24.94 V (15 pts)
+Compliance = 5/80 flagged (6.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.98 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:02:59 ===
+Status       = poor
+Warning      = 20 of 80 points excluded (compliance-flagged, 25.0%); remaining data may be under-sampled in saturation — T_e likely unreliable
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-35.06 V (12 pts), pos>=9.75 V (12 pts)
+Compliance = 20/80 flagged (25.0%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.38 eV R^2=0.9982
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:00 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.861, NRMSE=56.9%) — check for compliance clipping, noise, or model mismatch
+T_e  = 2.762 +- 1.578 eV
+T_e 95% CI (covariance) = [-0.330, 5.855] eV
+I_sat = 1.473e-03 A
+I_sat 95% CI (covariance) = [8.361e-04, 2.109e-03] A
+R^2   = 0.8615
+NRMSE = 56.87 %
+Model = tanh + slope
+n_i   = 1.133e+18 m^-3 (v_B=2583 m/s, Ar)
+n_i 95% CI (fit-only) = [3.316e+17, 1.934e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=0.34 eV R^2=0.0177
+  - tanh + slope: T_e=2.76 eV R^2=0.8615
+  - tanh + slope + asymmetry: T_e=2.83 eV R^2=0.8637
+
+=== 2026-04-21T07:03:00 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.25 V (16 pts), pos>=28.99 V (16 pts)
+Compliance = 1/80 flagged (1.2%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:00 ===
+Status       = poor
+Warning      = fit graded 'poor' (R²=0.968, NRMSE=17.7%) — check for compliance clipping, noise, or model mismatch
+T_e  = 4.000 +- 0.491 eV
+T_e 95% CI (covariance) = [3.038, 4.962] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [1.751e-03, 2.249e-03] A
+R^2   = 0.9683
+NRMSE = 17.68 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.057e+18, 1.499e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=0.9635
+  - tanh + slope: T_e=4.00 eV R^2=0.9683
+  - tanh + slope + asymmetry: T_e=3.78 eV R^2=0.9826
+
+=== 2026-04-21T07:03:00 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (32 pts), pos>=30.00 V (32 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:00 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=3.95 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:00 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:01 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:02 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:02 ===
+T_e  = 4.000 +- 0.000 eV
+T_e 95% CI (covariance) = [4.000, 4.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.278e+18 m^-3 (v_B=3108 m/s, Ar)
+n_i 95% CI (fit-only) = [1.278e+18, 1.278e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Models:
+  - Simple tanh: T_e=3.99 eV R^2=1.0000
+  - tanh + slope: T_e=4.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=4.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:03 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-32.53 V (14 pts), pos>=19.87 V (14 pts)
+Compliance = 10/80 flagged (12.5%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.99 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:07 ===
+Status       = poor
+Warning      = 10 of 80 compliance-flagged points retained in fit (12.5%); clipped plateau biases T_e and I_sat — switch to exclude_clipped or re-acquire with higher compliance
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 2.000e-03 A
+I_sat 95% CI (covariance) = [2.000e-03, 2.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 1.476e+18 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [1.476e+18, 1.476e+18] m^-3
+Fit region: neg<=-30.00 V (16 pts), pos>=30.00 V (16 pts)
+Compliance = 10/80 flagged (12.5%), action=retained_in_fit
+Models:
+  - Simple tanh: T_e=3.00 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+
+=== 2026-04-21T07:03:23 ===
+T_e  = 3.000 +- 0.000 eV
+T_e 95% CI (covariance) = [3.000, 3.000] eV
+I_sat = 1.000e-03 A
+I_sat 95% CI (covariance) = [1.000e-03, 1.000e-03] A
+R^2   = 1.0000
+NRMSE = 0.00 %
+Model = tanh + slope
+n_i   = 7.381e+17 m^-3 (v_B=2692 m/s, Ar)
+n_i 95% CI (fit-only) = [7.381e+17, 7.381e+17] m^-3
+Fit region: neg<=-16.20 V (11 pts), pos>=16.20 V (11 pts)
+Compliance = 6/61 flagged (9.8%), action=excluded_from_fit
+Models:
+  - Simple tanh: T_e=2.96 eV R^2=1.0000
+  - tanh + slope: T_e=3.00 eV R^2=1.0000
+  - tanh + slope + asymmetry: T_e=3.00 eV R^2=1.0000
+

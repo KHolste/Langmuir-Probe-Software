@@ -754,7 +754,7 @@ class DLPMainWindowV2(DLPMainWindow):
                              f"{buf_lens}", "error")
         self._save_folder.mkdir(parents=True, exist_ok=True)
         from datetime import datetime
-        path = make_csv_path(self._save_folder)
+        path = self._make_csv_path(self._save_folder)
         meta = {
             "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "Instrument": self.lblIdn.text(),
@@ -768,6 +768,10 @@ class DLPMainWindowV2(DLPMainWindow):
             "Bidirectional": str(self.chkBidir.isChecked()),
             "Points": str(len(self._v_soll)),
             "Run_Status": run_status,
+            # Acquisition-method tag — resolved through the base-class
+            # hook so LP-level subclasses can steer routing + tagging
+            # via a single method override instead of module patching.
+            "Method": self._csv_dataset_method(),
         }
         if failure_reason:
             meta["Failure_Reason"] = failure_reason
@@ -787,9 +791,9 @@ class DLPMainWindowV2(DLPMainWindow):
                 meta["Analysis_n_i_m3"] = f"{pp['n_i_m3']:.4e}"
                 meta["Analysis_v_Bohm_ms"] = f"{pp.get('v_Bohm_ms', 0):.1f}"
         try:
-            write_csv(path, meta, self._v_soll, self._i_mean,
-                      self._i_std, self._v_ist,
-                      self._directions, self._compliance)
+            self._write_csv(path, meta, self._v_soll, self._i_mean,
+                            self._i_std, self._v_ist,
+                            self._directions, self._compliance)
             # Remember the path so the Analyze path writes its
             # options sidecar next to this CSV (and not next to a
             # stale previous one).
